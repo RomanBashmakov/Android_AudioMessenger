@@ -5,18 +5,18 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.os.Build;
-import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class MainActivity extends Activity {
 
@@ -27,22 +27,24 @@ public class MainActivity extends Activity {
     int REQUEST_READ_STORAGE_REQUEST_CODE=2;
     int RECORD_AUDIO_REQUEST_CODE=3;
 
-    //-----------------------------------
-    private void requestAppPermissions()
-    {
-        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+    Handler h;
+
+    void saveFile(short[] file) {
+        String recordedValues= Arrays.toString(file);
+        try
         {
-            return;
+            FileOutputStream fileOutput=openFileOutput("recordedValues.txt", MODE_APPEND);
+            fileOutput.write(recordedValues.getBytes());
+            fileOutput.close();
+            Toast.makeText(MainActivity.this, "Data has been saved", Toast.LENGTH_SHORT).show();
         }
-
-        ActivityCompat.requestPermissions(this,
-            new String[]
-                {
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                }, REQUEST_WRITE_STORAGE_REQUEST_CODE); // your request code
-
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    //-----------------------------------
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -50,41 +52,30 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + System.currentTimeMillis() + ".3gp";
-        //requestAppPermissions();
-
-        // Record to the external cache directory for visibility
-        fileName = getExternalCacheDir().getAbsolutePath();
-        fileName += "/audiorecordtest.3gp";
-
+        h = new Handler(Looper.getMainLooper()) {
+            public void handleMessage(android.os.Message msg)
+            {
+                saveFile((short[]) msg.obj);
+            }
+        };
     }
 
-    public void recordStart(View v) {
+    public void recordStart(View v)
+    {
+        // Record to the external cache directory for visibility
+        fileName = getExternalCacheDir().getAbsolutePath();
+        fileName += "/audiorecordtest.txt";
 
-        releaseRecorder();
-
-        File outFile = new File(fileName);
-        if (outFile.exists()) {
-            outFile.delete();
-        }
-
-        mediaRecorder = new MediaRecorder();
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-        mediaRecorder.setOutputFile(fileName);
-        try {
-            mediaRecorder.prepare();
-            mediaRecorder.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        AmplitudeReader thread = new AmplitudeReader();
+        thread.addHandler(h);
+        thread.start();
     }
 
     public void recordStop(View v) {
-        if (mediaRecorder != null) {
+        if (thread != null) {
             mediaRecorder.stop();
         }
+        thread.stopRecording();
     }
 
     public void getPermission(View v) {
@@ -93,6 +84,12 @@ public class MainActivity extends Activity {
                 {
                     Manifest.permission.RECORD_AUDIO
                 }, RECORD_AUDIO_REQUEST_CODE); // your request code
+
+        ActivityCompat.requestPermissions(this,
+            new String[]
+                {
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                }, REQUEST_WRITE_STORAGE_REQUEST_CODE); // your request code
     }
 
     public void playStart(View v) {

@@ -1,3 +1,5 @@
+package com.example.audiorecorder;
+
 import android.annotation.SuppressLint;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -6,7 +8,7 @@ import android.os.Handler;
 import java.util.ArrayList;
 import java.util.List;
 
-class AmplitudeReader extends Thread {
+public class AmplitudeReader extends Thread {
 
     private AudioRecord audioRecord;
     private int bufflen;
@@ -15,15 +17,15 @@ class AmplitudeReader extends Thread {
     final int MSG_DATA = 101;
     private boolean mIsRunning;
 
-    private List<Handler> handlers;
+    private List<Handler> handlers = new ArrayList<>();
 
     @SuppressLint("MissingPermission")
-    public AmplitudeReader() {
+    public AmplitudeReader()
+    {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
         int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
         int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
         bufflen = AudioRecord.getMinBufferSize(SAMPPERSEC, channelConfiguration, audioEncoding);
-        handlers = new ArrayList<Handler>();
 
         audioRecord = new AudioRecord(
                 android.media.MediaRecorder.AudioSource.MIC,
@@ -35,15 +37,29 @@ class AmplitudeReader extends Thread {
         audioRecord.startRecording();
     }
 
-    private short getMax(short[] arr, int count) {
+    public void addHandler(Handler handler)
+    {
+        handlers.add(handler);
+    }
+
+    private short getMax(short[] arr, int count)
+    {
         short m = 0;
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++)
+        {
             short c = (short) Math.abs(arr[i]);
-            if (m < c) {
+            if (m < c)
+            {
                 m = c;
             }
         }
         return m;
+    }
+
+
+    public void stopRecording()
+    {
+        mIsRunning = false;
     }
 
     // циклический буфер буферов. Чтобы не затереть данные,
