@@ -31,6 +31,9 @@ public class MainActivity extends Activity {
 
     Handler h;
 
+    fileName = getExternalCacheDir().getAbsolutePath();
+    fileName += "/audiorecordtest.3gp";
+
     void saveFile(short[] file) {
         String recordedValues= Arrays.toString(file);
         try
