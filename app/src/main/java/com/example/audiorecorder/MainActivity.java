@@ -21,7 +21,6 @@ import java.io.OutputStreamWriter;
 import java.util.Arrays;
 
 public class MainActivity extends Activity {
-S
     private MediaRecorder mediaRecorder;
     private MediaPlayer mediaPlayer;
     private String fileName;
