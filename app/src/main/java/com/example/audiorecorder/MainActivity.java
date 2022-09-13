@@ -13,19 +13,22 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
 
 public class MainActivity extends Activity {
-
+S
     private MediaRecorder mediaRecorder;
     private MediaPlayer mediaPlayer;
     private String fileName;
     int REQUEST_WRITE_STORAGE_REQUEST_CODE=1;
     int REQUEST_READ_STORAGE_REQUEST_CODE=2;
     int RECORD_AUDIO_REQUEST_CODE=3;
+    AmplitudeReader thread;
 
     Handler h;
 
@@ -33,15 +36,21 @@ public class MainActivity extends Activity {
         String recordedValues= Arrays.toString(file);
         try
         {
-            FileOutputStream fileOutput=openFileOutput("recordedValues.txt", MODE_APPEND);
-            fileOutput.write(recordedValues.getBytes());
-            fileOutput.close();
+            // отрываем поток для записи
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+                    openFileOutput("recordedValues.txt", MODE_APPEND)));
+            // пишем данные
+            bw.write("Содержимое файла");
+            // закрываем поток
+            bw.close();
             Toast.makeText(MainActivity.this, "Data has been saved", Toast.LENGTH_SHORT).show();
         }
         catch (FileNotFoundException e)
         {
             e.printStackTrace();
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
     }
@@ -58,24 +67,21 @@ public class MainActivity extends Activity {
                 saveFile((short[]) msg.obj);
             }
         };
+
+        thread = new AmplitudeReader();
+        thread.addHandler(h);
     }
 
     public void recordStart(View v)
     {
-        // Record to the external cache directory for visibility
-        fileName = getExternalCacheDir().getAbsolutePath();
-        fileName += "/audiorecordtest.txt";
-
-        AmplitudeReader thread = new AmplitudeReader();
-        thread.addHandler(h);
         thread.start();
     }
 
     public void recordStop(View v) {
-        if (thread != null) {
-            mediaRecorder.stop();
+        if (thread != null)
+        {
+            thread.stopRecording();
         }
-        thread.stopRecording();
     }
 
     public void getPermission(View v) {
@@ -92,36 +98,20 @@ public class MainActivity extends Activity {
                 }, REQUEST_WRITE_STORAGE_REQUEST_CODE); // your request code
     }
 
-    public void playStart(View v) {
-        try {
-            releasePlayer();
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setDataSource(fileName);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void playStart(View v)
+    {
     }
 
-    public void playStop(View v) {
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-        }
+    public void playStop(View v)
+    {
     }
 
-    private void releaseRecorder() {
-        if (mediaRecorder != null) {
-            mediaRecorder.release();
-            mediaRecorder = null;
-        }
+    private void releaseRecorder()
+    {
     }
 
-    private void releasePlayer() {
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
+    private void releasePlayer()
+    {
     }
 
     @Override

@@ -17,24 +17,15 @@ public class AmplitudeReader extends Thread {
     final int MSG_DATA = 101;
     private boolean mIsRunning;
 
+    int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
+    int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
+
     private List<Handler> handlers = new ArrayList<>();
 
-    @SuppressLint("MissingPermission")
     public AmplitudeReader()
     {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-        int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
-        int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
         bufflen = AudioRecord.getMinBufferSize(SAMPPERSEC, channelConfiguration, audioEncoding);
-
-        audioRecord = new AudioRecord(
-                android.media.MediaRecorder.AudioSource.MIC,
-                SAMPPERSEC,
-                channelConfiguration,
-                audioEncoding,
-                bufflen
-        );
-        audioRecord.startRecording();
     }
 
     public void addHandler(Handler handler)
@@ -62,15 +53,24 @@ public class AmplitudeReader extends Thread {
         mIsRunning = false;
     }
 
-    // циклический буфер буферов. Чтобы не затереть данные,
-    // пока главный поток их обрабатывает
-    short[][] buffers = new short[BUFF_COUNT][bufflen >> 1];
-
-
+    @SuppressLint("MissingPermission")
     @Override
     public void run()
     {
+        // циклический буфер буферов. Чтобы не затереть данные,
+        // пока главный поток их обрабатывает
+        short[][] buffers = new short[BUFF_COUNT][bufflen];
+
+        audioRecord = new AudioRecord(
+                android.media.MediaRecorder.AudioSource.MIC,
+                SAMPPERSEC,
+                channelConfiguration,
+                audioEncoding,
+                bufflen*10
+        );
+
         mIsRunning = true;
+        audioRecord.startRecording();
         int count = 0;
         while(mIsRunning)
         {
@@ -91,13 +91,6 @@ public class AmplitudeReader extends Thread {
             sendMsg(buffers[count]);
 
             count = (count + 1) % BUFF_COUNT;
-        }
-
-
-        for(int i=0; i<11; i++) {
-            short[] curr = new short[bufflen];
-            int curread = audioRecord.read(curr, 0, bufflen);
-            System.err.println("current amplitude is:" + getMax(curr, curread));
         }
 
         try
