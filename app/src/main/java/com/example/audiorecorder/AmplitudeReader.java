@@ -16,6 +16,7 @@ public class AmplitudeReader extends Thread {
     private final int BUFF_COUNT = 32;
     final int MSG_DATA = 101;
     private boolean mIsRunning;
+    final int THREAD_END = 102;
 
     int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
     int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
@@ -92,17 +93,20 @@ public class AmplitudeReader extends Thread {
 
             count = (count + 1) % BUFF_COUNT;
         }
-
         try
         {
-            try
+            audioRecord.stop();
+            if(!mIsRunning)
             {
-                audioRecord.stop();
+                for(Handler handler : handlers)
+                {
+                    handler.sendMessage(handler.obtainMessage(THREAD_END));
+                }
             }
-            catch(IllegalStateException e)
-            {
-                e.printStackTrace();
-            }
+        }
+        catch(IllegalStateException e)
+        {
+            e.printStackTrace();
         }
         finally
         {

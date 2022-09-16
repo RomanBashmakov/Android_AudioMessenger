@@ -2,6 +2,7 @@ package com.example.audiorecorder;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -13,17 +14,24 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.audiorecorder.application.GlobalApplication;
+
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
+import java.util.logging.Logger;
+
 
 public class MainActivity extends Activity {
     private MediaRecorder mediaRecorder;
     private MediaPlayer mediaPlayer;
     private String fileName;
+    int howManyTimes=0;
     int REQUEST_WRITE_STORAGE_REQUEST_CODE=1;
     int REQUEST_READ_STORAGE_REQUEST_CODE=2;
     int RECORD_AUDIO_REQUEST_CODE=3;
@@ -31,51 +39,44 @@ public class MainActivity extends Activity {
 
     Handler h;
 
-    fileName = getExternalCacheDir().getAbsolutePath();
-    fileName += "/audiorecordtest.3gp";
-
     void saveFile(short[] file) {
         String recordedValues= Arrays.toString(file);
-        try
-        {
-            // отрываем поток для записи
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                    openFileOutput("recordedValues.txt", MODE_APPEND)));
-            // пишем данные
-            bw.write("Содержимое файла");
-            // закрываем поток
-            bw.close();
-            Toast.makeText(MainActivity.this, "Data has been saved", Toast.LENGTH_SHORT).show();
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+            Context context = GlobalApplication.getAppContext();
+            try {
+                FileWriter out = new FileWriter(new File(context.getExternalFilesDir(null), fileName), true);
+                out.write(recordedValues);
+                out.close();
+                howManyTimes++;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+        //fileName = getExternalCacheDir().getAbsolutePath()+"/obtainedValues.txt";
+        fileName = "obtainedValues.txt";
+
+                super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         h = new Handler(Looper.getMainLooper()) {
             public void handleMessage(android.os.Message msg)
             {
                 saveFile((short[]) msg.obj);
+                if(msg.what==thread.THREAD_END)
+                {
+                    thread.interrupt();
+                }
             }
         };
-
-        thread = new AmplitudeReader();
-        thread.addHandler(h);
     }
 
     public void recordStart(View v)
     {
+        thread = new AmplitudeReader();
+        thread.addHandler(h);
         thread.start();
     }
 
@@ -106,6 +107,7 @@ public class MainActivity extends Activity {
 
     public void playStop(View v)
     {
+        Toast.makeText(MainActivity.this, Integer.toString(howManyTimes), Toast.LENGTH_SHORT).show();
     }
 
     private void releaseRecorder()

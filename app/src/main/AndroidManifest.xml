@@ -8,6 +8,7 @@
 
 
     <application
+        android:name="com.example.audiorecorder.application.GlobalApplication"
         android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
