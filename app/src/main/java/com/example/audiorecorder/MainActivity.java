@@ -26,30 +26,52 @@ import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import ddf.minim.effects.BandPass;
+
 
 public class MainActivity extends Activity {
     private MediaRecorder mediaRecorder;
     private MediaPlayer mediaPlayer;
     private String fileName;
+    private String filteredValues;
     int howManyTimes=0;
     int REQUEST_WRITE_STORAGE_REQUEST_CODE=1;
     int REQUEST_READ_STORAGE_REQUEST_CODE=2;
     int RECORD_AUDIO_REQUEST_CODE=3;
     AmplitudeReader thread;
+    BandPass bandpass;
+    float[] floatedValues;
+    String recordedValues;
 
     Handler h;
 
     void saveFile(short[] file) {
-        String recordedValues= Arrays.toString(file);
-            Context context = GlobalApplication.getAppContext();
-            try {
-                FileWriter out = new FileWriter(new File(context.getExternalFilesDir(null), fileName), true);
-                out.write(recordedValues);
-                out.close();
-                howManyTimes++;
-            } catch (IOException e) {
-                e.printStackTrace();
+        Context context = GlobalApplication.getAppContext();
+        //not filtered
+        try {
+            recordedValues= Arrays.toString(file);
+            FileWriter out = new FileWriter(new File(context.getExternalFilesDir(null), fileName), true);
+            out.write(recordedValues);
+            out.close();
+            howManyTimes++;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //filtered
+        try {
+            floatedValues=new float[file.length];
+            for (int i=0; i<file.length; i++)
+            {
+                floatedValues[i]=(float) file[i];
             }
+            bandpass.process(floatedValues);
+            recordedValues= Arrays.toString(file);
+            FileWriter out = new FileWriter(new File(context.getExternalFilesDir(null), filteredValues), true);
+            out.write(recordedValues);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -57,9 +79,13 @@ public class MainActivity extends Activity {
     {
         //fileName = getExternalCacheDir().getAbsolutePath()+"/obtainedValues.txt";
         fileName = "obtainedValues.txt";
+        filteredValues= "filteredValues.txt";
 
                 super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        bandpass=new BandPass(1000,100,44100);
 
         h = new Handler(Looper.getMainLooper()) {
             public void handleMessage(android.os.Message msg)
