@@ -49,7 +49,16 @@ public class MainActivity extends Activity {
         Context context = GlobalApplication.getAppContext();
         //not filtered
         try {
-            recordedValues= Arrays.toString(file);
+            //recordedValues= Arrays.toString(file);
+            StringBuilder sb = new StringBuilder(file.length);
+            for (int i = 0; i < file.length; ++i) {
+                if (i > 0) {
+                    sb.append(" ");
+                }
+                sb.append(Short.toString(file[i]));
+            }
+            String recordedValues = sb.toString();
+
             FileWriter out = new FileWriter(new File(context.getExternalFilesDir(null), fileName), true);
             out.write(recordedValues);
             out.close();
@@ -65,10 +74,20 @@ public class MainActivity extends Activity {
                 floatedValues[i]=(float) file[i];
             }
             bandpass.process(floatedValues);
-            recordedValues= Arrays.toString(file);
-            FileWriter out = new FileWriter(new File(context.getExternalFilesDir(null), filteredValues), true);
-            out.write(recordedValues);
-            out.close();
+
+
+            StringBuilder sb = new StringBuilder(file.length);
+            for (int i = 0; i < file.length; ++i) {
+                if (i > 0) {
+                    sb.append(" ");
+                }
+                sb.append(Float.toString(file[i]));
+            }
+            recordedValues = sb.toString();
+            //recordedValues= Arrays.toString(floatedValues);
+            FileWriter outFiltered = new FileWriter(new File(context.getExternalFilesDir(null), filteredValues), true);
+            outFiltered.write(recordedValues);
+            outFiltered.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -90,10 +109,13 @@ public class MainActivity extends Activity {
         h = new Handler(Looper.getMainLooper()) {
             public void handleMessage(android.os.Message msg)
             {
-                saveFile((short[]) msg.obj);
                 if(msg.what==thread.THREAD_END)
                 {
                     thread.interrupt();
+                }
+                else
+                {
+                    saveFile((short[]) msg.obj);
                 }
             }
         };
