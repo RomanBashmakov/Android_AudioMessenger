@@ -3,6 +3,7 @@ package com.example.audiorecorder;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -12,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.audiorecorder.application.GlobalApplication;
@@ -42,6 +44,10 @@ public class MainActivity extends Activity {
     BandPass bandpass;
     float[] floatedValues;
     String recordedValues;
+
+    int filterFrequency=1000;
+    int filterBW=100;
+    float duration=(float) 0.1;
 
     Handler h;
 
@@ -96,13 +102,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        //fileName = getExternalCacheDir().getAbsolutePath()+"/obtainedValues.txt";
         fileName = "obtainedValues.txt";
         filteredValues= "filteredValues.txt";
 
-                super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         bandpass=new BandPass(1000,100,44100);
 
@@ -151,6 +155,24 @@ public class MainActivity extends Activity {
 
     public void playStart(View v)
     {
+    }
+
+    TextView frequencyFilter=(TextView) findViewById(R.id.frequencyFilter);
+    public void setHz(View v)
+    {
+        filterFrequency = Integer.parseInt(frequencyFilter.getText().toString()); // duration of sound in ms
+    }
+
+    TextView BandWidthInput=(TextView) findViewById(R.id.BandWidthInput);
+    public void setBW(View v)
+    {
+        filterBW = Integer.parseInt(BandWidthInput.getText().toString()); // duration of sound in ms
+    }
+
+    TextView BitDuration=(TextView) findViewById(R.id.BitDuration);
+    public void setBD(View v)
+    {
+        duration = Float.parseFloat(BitDuration.getText().toString())/1000; // duration of sound in ms
     }
 
     public void playStop(View v)
@@ -216,6 +238,16 @@ public class MainActivity extends Activity {
                 Toast.makeText(MainActivity.this, "RECORD_AUDIO_REQUEST_CODE Permission Denied", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public void toTransmit(View view)
+    {
+        Intent intent = new Intent(this, MainActivity2.class);
+        startActivity(intent);
+    }
+
+    public void toReceive(View view)
+    {
     }
 
 }

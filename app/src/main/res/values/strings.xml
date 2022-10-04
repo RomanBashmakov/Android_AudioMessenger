@@ -1,9 +1,35 @@
 <resources>
-    <string name="app_name">AudioRecorder</string>
-    <string name="record">Record</string>
+
+    <string name="permissions">Permissions</string>
+    <string name="SendMessage">Send message</string>
+    <string name="Filter">Filter</string>
+    <string name="SoundOptions">Messenger options</string>
+    <string name="app_name">AudioMessenger</string>
+    <string name="record">Reception</string>
     <string name="play">Play</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+    <string name="Set_Hz">Set Hz</string>
+    <string name="Set_BandWidth">Set BW</string>
+    <string name="Set_BitDuration">Set BD</string>
+
+    <string name="GetFirstPermission">Mic</string>
+    <string name="GetSecondPermission">Storage</string>
+
     <string name="getPermission">getPermission</string>
+
+
+    <string name="Transmit">Transmit</string>
+    <string name="Receive">Receive</string>
+
+    <string name="Frequency">Frequency</string>
+    <string name="BandWidth">BandWidth</string>
+
+    <string name="BitDuration">BitDuration</string>
+    <string name="Packets">Data Packets Counter</string>
+    <string name="SentPackets">Sent Packets Counter</string>
+    <string name="TypeHere">Type your message here</string>
+
+    <string name="MessageHint">Message</string>
 
 </resources>

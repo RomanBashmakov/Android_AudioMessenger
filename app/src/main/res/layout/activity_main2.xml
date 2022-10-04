@@ -5,15 +5,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity2">
 
     <TextView
-        android:id="@+id/Permissions"
+        android:id="@+id/SendMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
         android:layout_marginTop="8dp"
-        android:text="@string/permissions"
+        android:text="@string/SendMessage"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="24sp"
@@ -21,81 +21,60 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <LinearLayout
-        app:layout_constraintTop_toBottomOf="@id/Record"
-        android:layout_marginVertical="10dp"
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginHorizontal="20dp">
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutPermissions"
+        tools:layout_editor_absoluteX="20dp">
+
+        <Button
+            android:id="@+id/Transmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/start" />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="recordStart"
-            android:text="@string/start"/>
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="recordStop"
-            android:text="@string/stop"/>
+            android:onClick="stopTransmitting"
+            android:text="@string/stop" />
 
     </LinearLayout>
 
-    <TextView
-        app:layout_constraintTop_toBottomOf="@id/linearLayoutPermissions"
-        android:layout_marginVertical="40dp"
-        android:id="@+id/Record"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp"
-        android:text="@string/record"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="24sp"/>
-
     <LinearLayout
-        app:layout_constraintTop_toBottomOf="@id/Permissions"
+        app:layout_constraintTop_toBottomOf="@id/SendMessage"
         android:layout_marginVertical="10dp"
         android:id="@+id/linearLayoutPermissions"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginHorizontal="10dp">
-        <Button
-            android:layout_weight="1"
-            android:id="@+id/button3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="getPermission"
-            android:text="@string/GetFirstPermission"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="40dp"
-            app:layout_constraintTop_toBottomOf="@id/Permissions"/>
 
-        <Button
-            android:layout_weight="1"
-            android:id="@+id/button2"
-            android:layout_width="match_parent"
+        <EditText
+            android:id="@+id/textToTransmit"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="getPermission"
-            android:text="@string/GetSecondPermission"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/button3"
-            tools:layout_editor_absoluteY="40dp" />
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/TypeHere"
+            android:inputType="textPersonName" />
     </LinearLayout>
 
     <TextView
-        app:layout_constraintTop_toBottomOf="@id/packetsCounter"
-        android:layout_marginVertical="40dp"
         android:id="@+id/Filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
-        android:text="@string/Filter"
+        android:layout_marginVertical="40dp"
+        android:text="@string/SoundOptions"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:textSize="24sp"/>
+        android:textSize="24sp"
+        app:layout_constraintTop_toBottomOf="@+id/packetsCounter"
+        tools:layout_editor_absoluteX="10dp" />
 
     <LinearLayout
         app:layout_constraintTop_toBottomOf="@id/Filter"
@@ -106,7 +85,7 @@
         android:layout_marginHorizontal="10dp">
 
         <EditText
-            android:id="@+id/frequencyFilter"
+            android:id="@+id/setHz"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -117,14 +96,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:onClick="setHz"
+            android:onClick="setFrequency"
             android:text="@string/Set_Hz"/>
 
     </LinearLayout>
 
 
     <LinearLayout
-        android:id="@+id/SetBWLayout"
         app:layout_constraintTop_toBottomOf="@id/layoutFilter1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -132,31 +110,7 @@
         android:layout_marginVertical="10dp">
 
         <EditText
-            android:id="@+id/BandWidthInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/BandWidth"
-            android:inputType="number"/>
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:onClick="setBW"
-            android:text="@string/Set_BandWidth"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/SetBDLayout"
-        app:layout_constraintTop_toBottomOf="@id/SetBWLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginVertical="10dp">
-
-        <EditText
-            android:id="@+id/BitDuration"
+            android:id="@+id/BDInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -178,18 +132,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
         android:layout_marginVertical="10dp"
-        android:hint="@string/Packets"
-        android:textAlignment="center"
-        android:textSize="24sp" />
-
-    <TextView
-        android:id="@+id/messageOutput"
-        app:layout_constraintTop_toBottomOf="@id/SetBDLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginVertical="10dp"
-        android:hint="@string/MessageHint"
+        android:hint="@string/SentPackets"
         android:textAlignment="center"
         android:textSize="24sp"
         tools:layout_editor_absoluteX="-30dp"
@@ -207,14 +150,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="toTransmit"
-            android:text="@string/Transmit" />
+            android:text="@string/Transmit"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="toReceive"
-            android:text="@string/Receive" />
+            android:text="@string/Receive"/>
     </LinearLayout>
 
 
