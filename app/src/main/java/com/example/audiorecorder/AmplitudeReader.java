@@ -14,8 +14,9 @@ public class AmplitudeReader extends Thread {
     private int bufflen;
     private static final int SAMPPERSEC = 44100;
     private final int BUFF_COUNT = 32;
+
+    boolean mIsRunning;
     final int MSG_DATA = 101;
-    private boolean mIsRunning;
     final int THREAD_END = 102;
 
     int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
@@ -33,21 +34,6 @@ public class AmplitudeReader extends Thread {
     {
         handlers.add(handler);
     }
-
-    private short getMax(short[] arr, int count)
-    {
-        short m = 0;
-        for (int i = 0; i < count; i++)
-        {
-            short c = (short) Math.abs(arr[i]);
-            if (m < c)
-            {
-                m = c;
-            }
-        }
-        return m;
-    }
-
 
     public void stopRecording()
     {
