@@ -25,7 +25,7 @@
         android:layout_marginVertical="10dp"
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="48dp"
         android:layout_marginHorizontal="20dp">
 
         <Button
@@ -60,7 +60,7 @@
         android:layout_marginVertical="10dp"
         android:id="@+id/linearLayoutPermissions"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="48dp"
         android:layout_marginHorizontal="10dp">
         <Button
             android:layout_weight="1"
@@ -70,7 +70,7 @@
             android:onClick="getMicPermission"
             android:text="@string/GetFirstPermission"
             app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="40dp"
+            tools:layout_editor_absoluteY="48dp"
             app:layout_constraintTop_toBottomOf="@id/Permissions"/>
 
         <Button
@@ -102,20 +102,20 @@
         android:layout_marginVertical="10dp"
         android:id="@+id/layoutFilter1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginHorizontal="10dp">
 
         <EditText
             android:id="@+id/frequencyFilter"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:hint="@string/Frequency"
             android:inputType="number"/>
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="2"
             android:onClick="setHz"
             android:text="@string/Set_Hz"/>
@@ -137,7 +137,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/BandWidth"
-            android:inputType="number"/>
+            android:inputType="number"
+            android:minHeight="48dp" />
 
         <Button
             android:layout_width="match_parent"
@@ -156,12 +157,14 @@
         android:layout_marginVertical="10dp">
 
         <EditText
+            android:textColor="@color/black"
             android:id="@+id/BitDuration"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/BitDuration"
-            android:inputType="number"/>
+            android:inputType="number"
+            android:minHeight="48dp" />
 
         <Button
             android:layout_width="match_parent"
@@ -185,6 +188,7 @@
         tools:layout_editor_absoluteX="10dp" />
 
     <TextView
+        android:textColor="@color/black"
         android:id="@+id/messageOutput"
         app:layout_constraintTop_toBottomOf="@id/SetBDLayout"
         android:layout_width="match_parent"
@@ -219,6 +223,15 @@
             android:text="@string/Receive" />
     </LinearLayout>
 
+    <TextView
+        android:textColor="@color/black"
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/messageOutput" />
 
 
 </android.support.constraint.ConstraintLayout>

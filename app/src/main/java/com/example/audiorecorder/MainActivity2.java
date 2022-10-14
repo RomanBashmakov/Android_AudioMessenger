@@ -1,3 +1,4 @@
+//Transmitter
 package com.example.audiorecorder;
 
 import android.content.Intent;
@@ -13,12 +14,13 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.BitSet;
 
+//Receiver
 public class MainActivity2 extends AppCompatActivity {
 
-    float duration = (float) 0.1; // duration of sound
-    final int sampleRate = 22050; // Hz
-    int freq = 500; // Hz
-    int numSamples = (int) (sampleRate*duration);// 1/10 - duration
+    public static float duration = (float) 0.3; // duration of sound
+    public static int sampleRate = 44100; // Hz
+    public static int freq = 500; // Hz
+    public static int numSamples = (int) (sampleRate*duration);// 1/10 - duration
     double samples[] = new double[numSamples];
     short buffer[] = new short[numSamples];
     AudioTrack audioTrack;
@@ -71,6 +73,20 @@ public class MainActivity2 extends AppCompatActivity {
                 for (int i = bitbuffer.nextSetBit(0); i >= 0; i = bitbuffer.nextSetBit(i+1))
                 {
                     booleanList.set((i),true);
+                }
+
+                //Add the preambula at the beginning
+                //1010101010
+                for (int i=0; i<=9; i++)
+                {
+                    if(i%2==0)
+                    {
+                        booleanList.add(0,false);
+                    }
+                    else
+                    {
+                        booleanList.add(0,true);
+                    }
                 }
 
                 //Initialize audioBuffer everytime to avoid corrupted wave

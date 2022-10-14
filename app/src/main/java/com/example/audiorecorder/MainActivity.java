@@ -1,3 +1,4 @@
+//Receiver
 package com.example.audiorecorder;
 
 import android.Manifest;
@@ -5,8 +6,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -21,6 +20,7 @@ import com.example.audiorecorder.application.GlobalApplication;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import ddf.minim.effects.BandPass;
 
@@ -30,9 +30,8 @@ public class MainActivity extends Activity {
     private TextView BandWidthInput;
     private TextView frequencyFilter;
     private TextView dataPacketsCounter;
+    private TextView messageOutput;
 
-    private MediaRecorder mediaRecorder;
-    private MediaPlayer mediaPlayer;
     private String fileName;
     private String filteredValues;
     private String processedValues;
@@ -43,13 +42,36 @@ public class MainActivity extends Activity {
     AmplitudeReader thread;
     BandPass bandpass;
     float[] floatedValues;
+    float[] movingAverageValues;
     String recordedValues;
     StringBuilder showPacketsSB;
+    StringBuilder showMessageSB;
 
-    int filterFrequency=1000;
-    int filterBW=100;
-    float movingAverageAccumulatorPrevious=0; //sum of 'window' elements
-    float duration=(float) 0.1;
+    int dataSampleRate = MainActivity2.sampleRate;
+    int filterFrequency = 500;
+    int filterBW = 100;
+    float movingAverageAccumulatorPrevious = 0; //sum of 'window' elements
+    float duration = (float) 0.3;//=300ms
+
+    ArrayList<Boolean> bitsInMessage1 = new ArrayList<Boolean>(1000);
+    ArrayList<Boolean> bitsInMessage2 = new ArrayList<Boolean>(1000);
+    int bitIndex1 = 0;//the last and current index
+    int bitIndex2 = 0;//the last and current index for shifted measurement
+
+    int sampleIndex = 0;//the last and current index when preambula is detected
+    int sampleIndex1 = 0;//the last and current index for non-shifted measurement
+    int sampleIndex2 = 0;//the last and current index for shifted measurement
+    float bitThreshold = 1000;//to compare with
+    int numberToEnd = 0;//between the last measurement and bufLength
+    int numSamples = 0;//between the measurements
+    boolean isPreambula = false;// if preambula is detected = true
+
+    boolean isBufferEnd = false;// if buffer end is riched = true
+    boolean isBufferEnd1 = false;
+    boolean isBufferEnd2 = false;
+
+    int preambulaCounter1 = 0;
+    int preambulaCounter2 = 0;
 
     Handler h;
 
@@ -60,20 +82,33 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         fileName = "obtainedValues.txt";
-        filteredValues= "filteredValues.txt";
-        processedValues= "processedValues.txt";
+        filteredValues = "filteredValues.txt";
+        processedValues = "processedValues.txt";
 
-        BitDuration=(TextView) findViewById(R.id.BitDuration);
-        BandWidthInput=(TextView) findViewById(R.id.BandWidthInput);
-        frequencyFilter=(TextView) findViewById(R.id.frequencyFilter);
-        dataPacketsCounter=(TextView) findViewById(R.id.packetsCounter);
+        BitDuration = (TextView) findViewById(R.id.BitDuration);
+        BandWidthInput = (TextView) findViewById(R.id.BandWidthInput);
+        frequencyFilter = (TextView) findViewById(R.id.frequencyFilter);
+        dataPacketsCounter = (TextView) findViewById(R.id.packetsCounter);
 
-        bandpass=new BandPass(filterFrequency,filterBW,44100);
+        messageOutput = (TextView) findViewById(R.id.messageOutput);
+
+        bandpass = new BandPass(filterFrequency,filterBW,dataSampleRate);
+
+        numSamples = MainActivity2.numSamples;
+        sampleIndex2 = numSamples/2;
+
+        //booleanList initialization
+        for (int i = 0; i < bitsInMessage1.size(); ++i){
+            bitsInMessage1.add(false);
+        }
+        for (int i = 0; i < bitsInMessage2.size(); ++i){
+            bitsInMessage2.add(false);
+        }
 
         h = new Handler(Looper.getMainLooper()) {
             public void handleMessage(android.os.Message msg)
             {
-                if(msg.what==thread.THREAD_END)
+                if(msg.what == thread.THREAD_END)
                 {
                     thread.interrupt();
                 }
@@ -97,10 +132,7 @@ public class MainActivity extends Activity {
         {
             thread.stopRecording();
         }
-    }
-
-    public void playStart(View v)
-    {
+        isPreambula=false;
     }
 
     public void setHz(View v)
@@ -123,19 +155,9 @@ public class MainActivity extends Activity {
         Toast.makeText(MainActivity.this, Integer.toString(howManyTimes), Toast.LENGTH_SHORT).show();
     }
 
-    private void releaseRecorder()
-    {
-    }
-
-    private void releasePlayer()
-    {
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        releasePlayer();
-        releaseRecorder();
     }
 
     public void getMicPermission(View v) {
@@ -245,7 +267,7 @@ public class MainActivity extends Activity {
         floatedValues=new float[file.length];
         for (int i=0; i<file.length; i++)
         {
-            floatedValues[i]=(float) file[i];
+            floatedValues[i]=file[i];
         }
         bandpass.process(floatedValues);
 
@@ -269,6 +291,7 @@ public class MainActivity extends Activity {
         }
 
         //PROCESSED
+        movingAverageValues=new float[file.length];
         for (int i=0; i<floatedValues.length; i++)
         {
             if(floatedValues[i]<0)
@@ -278,7 +301,7 @@ public class MainActivity extends Activity {
         }
 
         //moving average for the filtered data
-        int movingAverageW=100; //window
+        int movingAverageW=200; //window
         float movingAverageAccumulator=0; //sum of 'window' elements
         for (int i=0; i<(floatedValues.length); i++)
         {
@@ -288,24 +311,21 @@ public class MainActivity extends Activity {
                 {
                     movingAverageAccumulator+=floatedValues[i-movingAverageW/2+w];
                 }
-                floatedValues[i]=movingAverageAccumulator/movingAverageW;
+                movingAverageValues[i]=movingAverageAccumulator/movingAverageW;
                 movingAverageAccumulator=0; //sum of 'window' elements
-                movingAverageAccumulatorPrevious=floatedValues[i];//
+                movingAverageAccumulatorPrevious=movingAverageValues[i];
             }
             else
             {
-                floatedValues[i]=movingAverageAccumulatorPrevious;
+                movingAverageValues[i]=movingAverageAccumulatorPrevious;
             }
         }
 
         StringBuilder sbProcessed = new StringBuilder(file.length);
-        for (int i = 0; i < floatedValues.length; i++)
+        for (int i = 0; i < movingAverageValues.length; i++)
         {
-            if (i > 0)
-            {
-                sbProcessed.append(" ");
-            }
-            sbProcessed.append(floatedValues[i]);
+            sbProcessed.append(movingAverageValues[i]);
+            sbProcessed.append(" ");
         }
         recordedValues = sbProcessed.toString();
         try
@@ -315,6 +335,201 @@ public class MainActivity extends Activity {
             out.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        //1 Looking for preambula. Non-shifted
+        if(!isPreambula)
+        {
+            while( !isBufferEnd1 && !isPreambula )
+            {
+                if ((preambulaCounter1 % 2) == 0)
+                {
+                    if ( sampleIndex1 < file.length)
+                    {
+                        if (movingAverageValues[sampleIndex1] > bitThreshold)
+                        {
+                            preambulaCounter1++;
+                        }
+                        else
+                        {
+                            preambulaCounter1 = 0;
+                        }
+                    }
+                    //если индекс не помещается в этом буфере
+                    else
+                    {
+                        sampleIndex1 = sampleIndex1 - file.length;
+                        isBufferEnd1 = true;
+                    }
+                }
+                else
+                {
+                    if ( sampleIndex1 < file.length)
+                    {
+                        if (movingAverageValues[sampleIndex1] < bitThreshold)
+                        {
+                            preambulaCounter1++;
+                        }
+                        else
+                        {
+                            preambulaCounter1 = 0;
+                        }
+                    }
+                    //если индекс не помещается в этом буфере
+                    else
+                    {
+                        sampleIndex1 = sampleIndex1 - file.length;
+                        isBufferEnd1 = true;
+                    }
+                }
+
+                //IF sampleIndex bigger than buffer size THEN interrupt 'while'
+                if(isBufferEnd1) break;
+
+                //if needed sample in this(current) massive
+                if ( (sampleIndex1 + numSamples) < file.length)
+                {
+                    sampleIndex1 = sampleIndex1 + numSamples;
+                }
+                //if needed sample is in the next massive
+                else// ЗДЕСЬ ТОЖЕ КОСЯК
+                {
+                    numberToEnd = file.length - sampleIndex1;
+                    sampleIndex1 = numSamples - numberToEnd;
+                    isBufferEnd1=true;
+                }
+
+                if (preambulaCounter1 == 9)
+                {
+                    isPreambula = true;
+                    sampleIndex = sampleIndex1;
+                    isBufferEnd = isBufferEnd1;
+                }
+            }
+            isBufferEnd1 = false;
+        }
+
+        //2 Looking for preambula. Shifted numSamples/2 to the right
+        if( !isPreambula )
+        {
+            while( !isBufferEnd2 && !isPreambula )
+            {
+                if( (preambulaCounter2 % 2) == 0)
+                {
+                    if ( sampleIndex2 < file.length)
+                    {
+                        if (movingAverageValues[sampleIndex2] > bitThreshold) {
+                            preambulaCounter2++;
+                        } else {
+                            preambulaCounter2 = 0;
+                        }
+                    }
+                    //если индекс не помещается в этом буфере
+                    else
+                    {
+                        sampleIndex2 = sampleIndex2 - file.length;
+                        isBufferEnd2 = true;
+                    }
+                }
+                else
+                {
+                    if ( sampleIndex2 < file.length)
+                    {
+                        if(movingAverageValues[sampleIndex2] < bitThreshold)
+                        {
+                            preambulaCounter2++;
+                        }
+                        else
+                        {
+                            preambulaCounter2 = 0;
+                        }
+                    }
+                    //если индекс не помещается в этом буфере
+                    else
+                    {
+                        sampleIndex2 = sampleIndex2 - file.length;
+                        isBufferEnd2 = true;
+                    }
+                }
+
+                //IF sampleIndex bigger than buffer size THEN interrupt 'while'
+                if(isBufferEnd2) break;
+
+                //if needed sample in this(current) massive
+                if((sampleIndex2 + numSamples) < file.length)
+                {
+                    sampleIndex2 = sampleIndex2 + numSamples;
+                }
+                //if needed sample is in the next massive
+                else
+                {
+                    numberToEnd = file.length - sampleIndex2;
+                    sampleIndex2 = numSamples - numberToEnd;
+                    isBufferEnd2 = true;
+                }
+
+                if(preambulaCounter2 == 9)
+                {
+                    isPreambula = true;
+                    sampleIndex = sampleIndex2;
+                    isBufferEnd = isBufferEnd2;
+                }
+            }
+            isBufferEnd2 = false;
+        }
+
+        //3 Reading the message
+        if(isPreambula) {
+            //print Preambula
+            showMessageSB = new StringBuilder();
+            showMessageSB.append("Preambula has been detected");
+            messageOutput.setText(showMessageSB.toString());
+
+//            while(!isBufferEnd)
+//            {
+//                if ( sampleIndex < file.length)
+//                {
+//                    if (movingAverageValues[sampleIndex] > bitThreshold) {
+//                        showMessageSB.append("1");
+//                        messageOutput.setText(showMessageSB.toString());
+//                    } else {
+//                        showMessageSB.append("0");
+//                        messageOutput.setText(showMessageSB.toString());
+//                    }
+//                }
+//                //если индекс не помещается в этом буфере
+//                else
+//                {
+//                    sampleIndex = sampleIndex - file.length;
+//                    isBufferEnd = true;
+//                }
+//
+//                //IF sampleIndex is bigger than buffer size THEN interrupt 'while'
+//                if(isBufferEnd) break;
+//
+//                //if needed sample in this(current) massive
+//                if((sampleIndex + numSamples) < file.length)
+//                {
+//                    sampleIndex = sampleIndex + numSamples;
+//                }
+//                //if needed sample is in the next massive
+//                else
+//                {
+//                    numberToEnd = file.length - sampleIndex;
+//                    sampleIndex = numSamples - numberToEnd;
+//                    isBufferEnd = true;
+//                }
+//            }
+//            isBufferEnd = false;
+//        }
+//        else
+//        {
+//            showMessageSB = new StringBuilder();
+//            showMessageSB.append(String.valueOf(preambulaCounter1));
+//            showMessageSB.append(String.valueOf(preambulaCounter2));
+//            messageOutput.setText(showMessageSB.toString());
+//        }
+//        isBufferEnd=false;
         }
     }
 }
