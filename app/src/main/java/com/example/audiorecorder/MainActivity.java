@@ -31,14 +31,15 @@ public class MainActivity extends Activity {
     private TextView frequencyFilter;
     private TextView dataPacketsCounter;
     private TextView messageOutput;
+    private TextView messageData;
 
     private String fileName;
     private String filteredValues;
     private String processedValues;
     int howManyTimes=0;
-    int REQUEST_WRITE_STORAGE_REQUEST_CODE=1;
-    int REQUEST_READ_STORAGE_REQUEST_CODE=2;
-    int RECORD_AUDIO_REQUEST_CODE=3;
+    int REQUEST_WRITE_STORAGE_REQUEST_CODE = 1;
+    int REQUEST_READ_STORAGE_REQUEST_CODE = 2;
+    int RECORD_AUDIO_REQUEST_CODE = 3;
     AmplitudeReader thread;
     BandPass bandpass;
     float[] floatedValues;
@@ -46,6 +47,8 @@ public class MainActivity extends Activity {
     String recordedValues;
     StringBuilder showPacketsSB;
     StringBuilder showMessageSB;
+    StringBuilder showMessageDataSB;
+    int datum = 0;
 
     int dataSampleRate = MainActivity2.sampleRate;
     int filterFrequency = 500;
@@ -53,8 +56,8 @@ public class MainActivity extends Activity {
     float movingAverageAccumulatorPrevious = 0; //sum of 'window' elements
     float duration = (float) 0.3;//=300ms
 
-    ArrayList<Boolean> bitsInMessage1 = new ArrayList<Boolean>(1000);
-    ArrayList<Boolean> bitsInMessage2 = new ArrayList<Boolean>(1000);
+    ArrayList<Boolean> bitsInMessage1 = new ArrayList<>(1000);
+    ArrayList<Boolean> bitsInMessage2 = new ArrayList<>(1000);
     int bitIndex1 = 0;//the last and current index
     int bitIndex2 = 0;//the last and current index for shifted measurement
 
@@ -89,10 +92,14 @@ public class MainActivity extends Activity {
         BandWidthInput = (TextView) findViewById(R.id.BandWidthInput);
         frequencyFilter = (TextView) findViewById(R.id.frequencyFilter);
         dataPacketsCounter = (TextView) findViewById(R.id.packetsCounter);
+        messageData = (TextView) findViewById(R.id.messageData);
 
         messageOutput = (TextView) findViewById(R.id.messageOutput);
+        showMessageDataSB = new StringBuilder();
 
         bandpass = new BandPass(filterFrequency,filterBW,dataSampleRate);
+
+        showMessageDataSB = new StringBuilder();
 
         numSamples = MainActivity2.numSamples;
         sampleIndex2 = numSamples/2;
@@ -239,11 +246,8 @@ public class MainActivity extends Activity {
         StringBuilder sb = new StringBuilder(file.length);
         for (int i = 0; i < file.length; i++)
         {
-            if (i > 0)
-            {
-                sb.append(" ");
-            }
             sb.append(Short.toString(file[i]));
+            sb.append(" ");
         }
         String recordedValues = sb.toString();
         try
@@ -274,11 +278,8 @@ public class MainActivity extends Activity {
         StringBuilder sbFiltered = new StringBuilder(file.length);
         for (int i = 0; i < file.length; i++)
         {
-            if (i > 0)
-            {
-                sbFiltered.append(" ");
-            }
             sbFiltered.append(floatedValues[i]);
+            sbFiltered.append(" ");
         }
         recordedValues = sbFiltered.toString();
         try
@@ -404,6 +405,11 @@ public class MainActivity extends Activity {
                     isPreambula = true;
                     sampleIndex = sampleIndex1;
                     isBufferEnd = isBufferEnd1;
+
+                    //print Preambula
+                    showMessageSB = new StringBuilder();
+                    showMessageSB.append("Preambula has been detected");
+                    messageOutput.setText(showMessageSB.toString());
                 }
             }
             isBufferEnd1 = false;
@@ -473,63 +479,75 @@ public class MainActivity extends Activity {
                     isPreambula = true;
                     sampleIndex = sampleIndex2;
                     isBufferEnd = isBufferEnd2;
+
+                    //print Preambula
+                    showMessageSB = new StringBuilder();
+                    showMessageSB.append("Preambula has been detected");
+                    messageOutput.setText(showMessageSB.toString());
                 }
             }
             isBufferEnd2 = false;
         }
 
         //3 Reading the message
-        if(isPreambula) {
-            //print Preambula
-            showMessageSB = new StringBuilder();
-            showMessageSB.append("Preambula has been detected");
-            messageOutput.setText(showMessageSB.toString());
+        if( isPreambula )
+        {
+            while(!isBufferEnd)
+            {
+                if ( sampleIndex < file.length )
+                {
+                    if (movingAverageValues[sampleIndex] > bitThreshold)
+                    {
+                        //showMessageDataSB.append("1");
+                        //messageData.setText(showMessageDataSB.toString());
+                        datum = datum | (1 << (bitIndex1-1));
+                    }
+                    else
+                    {
+                        //showMessageDataSB.append("0");
+                        //messageData.setText(showMessageDataSB.toString());
+                    }
+                    bitIndex1++;
+                    if ( bitIndex1 == 8)
+                    {
+                        showMessageDataSB.append( (char) datum );
+                        messageData.setText(showMessageDataSB.toString());
+                        bitIndex1 = 0;
+                        datum = 0;
+                    }
+                }
+                //если индекс не помещается в этом буфере
+                else
+                {
+                    sampleIndex = sampleIndex - file.length;
+                    isBufferEnd = true;
+                }
 
-//            while(!isBufferEnd)
-//            {
-//                if ( sampleIndex < file.length)
-//                {
-//                    if (movingAverageValues[sampleIndex] > bitThreshold) {
-//                        showMessageSB.append("1");
-//                        messageOutput.setText(showMessageSB.toString());
-//                    } else {
-//                        showMessageSB.append("0");
-//                        messageOutput.setText(showMessageSB.toString());
-//                    }
-//                }
-//                //если индекс не помещается в этом буфере
-//                else
-//                {
-//                    sampleIndex = sampleIndex - file.length;
-//                    isBufferEnd = true;
-//                }
-//
-//                //IF sampleIndex is bigger than buffer size THEN interrupt 'while'
-//                if(isBufferEnd) break;
-//
-//                //if needed sample in this(current) massive
-//                if((sampleIndex + numSamples) < file.length)
-//                {
-//                    sampleIndex = sampleIndex + numSamples;
-//                }
-//                //if needed sample is in the next massive
-//                else
-//                {
-//                    numberToEnd = file.length - sampleIndex;
-//                    sampleIndex = numSamples - numberToEnd;
-//                    isBufferEnd = true;
-//                }
-//            }
-//            isBufferEnd = false;
-//        }
-//        else
-//        {
-//            showMessageSB = new StringBuilder();
-//            showMessageSB.append(String.valueOf(preambulaCounter1));
-//            showMessageSB.append(String.valueOf(preambulaCounter2));
-//            messageOutput.setText(showMessageSB.toString());
-//        }
-//        isBufferEnd=false;
+                //IF sampleIndex is bigger than buffer size THEN interrupt 'while'
+                if (isBufferEnd) break;
+
+                //if needed sample in this(current) massive
+                if( (sampleIndex + numSamples) < file.length)
+                {
+                    sampleIndex = sampleIndex + numSamples;
+                }
+                //if needed sample is in the next massive
+                else
+                {
+                    numberToEnd = file.length - sampleIndex;
+                    sampleIndex = numSamples - numberToEnd;
+                    isBufferEnd = true;
+                }
+            }
+            isBufferEnd = false;
         }
+        else
+        {
+            showMessageSB = new StringBuilder();
+            showMessageSB.append(String.valueOf(preambulaCounter1));
+            showMessageSB.append(String.valueOf(preambulaCounter2));
+            messageOutput.setText(showMessageSB.toString());
+        }
+        isBufferEnd=false;
     }
 }
