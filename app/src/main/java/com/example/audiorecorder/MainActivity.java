@@ -393,7 +393,7 @@ public class MainActivity extends Activity {
                     sampleIndex1 = sampleIndex1 + numSamples;
                 }
                 //if needed sample is in the next massive
-                else// ЗДЕСЬ ТОЖЕ КОСЯК
+                else
                 {
                     numberToEnd = file.length - sampleIndex1;
                     sampleIndex1 = numSamples - numberToEnd;

@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -24,6 +25,9 @@ public class MainActivity2 extends AppCompatActivity {
     double samples[] = new double[numSamples];
     short buffer[] = new short[numSamples];
     AudioTrack audioTrack;
+
+    static ArrayList<transmitterSetting> transmitterSettingsList = new ArrayList<transmitterSetting>();
+    static transmitterSettingsAdapter transmitterSettingsAdapter;
 
     ArrayList<Boolean> booleanList = new ArrayList<Boolean>(1000);//bits number
 
@@ -133,6 +137,10 @@ public class MainActivity2 extends AppCompatActivity {
             }
         };
         btnTransmit.setOnClickListener(oclbtnTransmit);
+
+        transmitterSettingsAdapter = new transmitterSettingsAdapter(this, transmitterSettingsList);
+        ListView lvTransmitters = (ListView) findViewById(R.id.lvTransmitters);
+        lvTransmitters.setAdapter(transmitterSettingsAdapter);
     }
 
     public void stopTransmitting(View view)
@@ -144,42 +152,54 @@ public class MainActivity2 extends AppCompatActivity {
         }
     }
 
-    public void setBD(View view)
-    {
-        TextView setBD=(TextView) findViewById(R.id.BDInput);
-        duration = Float.parseFloat(setBD.getText().toString())/1000; // duration of sound in ms
-        numSamples = (int) (sampleRate*duration);
-        double samples[] = new double[numSamples];
-        buffer = new short[numSamples];
+//    public void setBD(View view)
+//    {
+//        TextView setBD=(TextView) findViewById(R.id.BDInput);
+//        duration = Float.parseFloat(setBD.getText().toString())/1000; // duration of sound in ms
+//        numSamples = (int) (sampleRate*duration);
+//        double samples[] = new double[numSamples];
+//        buffer = new short[numSamples];
+//
+//        //one bit sine array initialization
+//        for (int i = 1; i < numSamples; ++i)
+//        {
+//            samples[i] = Math.sin(2 * Math.PI * i / (sampleRate/freq)); // Sine wave
+//            buffer[i] = (short) (samples[i] * Short.MAX_VALUE);  // Higher amplitude increases volume
+//        }
+//    }
 
-        //one bit sine array initialization
-        for (int i = 1; i < numSamples; ++i)
-        {
-            samples[i] = Math.sin(2 * Math.PI * i / (sampleRate/freq)); // Sine wave
-            buffer[i] = (short) (samples[i] * Short.MAX_VALUE);  // Higher amplitude increases volume
-        }
-    }
-
-    public void setFrequency(View view)
-    {
-        TextView setHz=(TextView) findViewById(R.id.setHz);
-
-        freq = Integer.parseInt(setHz.getText().toString());
-        numSamples = (int) (sampleRate*duration);
-        double samples[] = new double[numSamples];
-        buffer = new short[numSamples];
-
-        //one bit sine array initialization
-        for (int i = 1; i < numSamples; ++i)
-        {
-            samples[i] = Math.sin(2 * Math.PI * i / (sampleRate/freq)); // Sine wave
-            buffer[i] = (short) (samples[i] * Short.MAX_VALUE);  // Higher amplitude increases volume
-        }
-    }
+//    public void setFrequency(View view)
+//    {
+//        TextView setHz=(TextView) findViewById(R.id.setHz);
+//
+//        freq = Integer.parseInt(setHz.getText().toString());
+//        numSamples = (int) (sampleRate*duration);
+//        double samples[] = new double[numSamples];
+//        buffer = new short[numSamples];
+//
+//        //one bit sine array initialization
+//        for (int i = 1; i < numSamples; ++i)
+//        {
+//            samples[i] = Math.sin(2 * Math.PI * i / (sampleRate/freq)); // Sine wave
+//            buffer[i] = (short) (samples[i] * Short.MAX_VALUE);  // Higher amplitude increases volume
+//        }
+//    }
 
 
     public void toTransmit(View view)
     {
+    }
+
+    public void addSetting(View view)
+    {
+        transmitterSettingsList.add(new transmitterSetting(1000,(float) 0.3));
+        transmitterSettingsAdapter.notifyDataSetChanged();
+    }
+
+    static public void deleteSetting(int Position)
+    {
+        transmitterSettingsList.remove(Position);
+        transmitterSettingsAdapter.notifyDataSetChanged();
     }
 
     public void toReceive(View view)
