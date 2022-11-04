@@ -1,11 +1,14 @@
 package com.example.audiorecorder;
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -44,11 +47,14 @@ public class transmitterSettingsAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // используем созданные, но не используемые view
-        View view = convertView;
-        if (view == null)
-        {
-            view = lInflater.inflate(R.layout.transmitter_layout_settings, parent, false);
-        }
+//        View view = convertView;
+
+        View view = lInflater.inflate(R.layout.transmitter_layout_settings, parent, false);
+
+//        if (view == null)
+//        {
+//            view = lInflater.inflate(R.layout.transmitter_layout_settings, parent, false);
+//        }
 
         ViewHolder viewHolder = new ViewHolder(view);
 
@@ -57,38 +63,41 @@ public class transmitterSettingsAdapter extends BaseAdapter {
         // заполняем View в пункте списка данными из настройки: частота, время бита
         viewHolder.textFrequency.setText(Integer.toString(TS.frequency));
         viewHolder.textBD.setText(((Float.toString(TS.duration))));
+        viewHolder.rb.setChecked(TS.checkedF);
 
-        // По нажатии обновляем настройки из View: частота, время бита
-        viewHolder.buttonBD.setOnClickListener (new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    TS.setDuration(Float.parseFloat(viewHolder.textBD.getText().toString()));
-                }
+        viewHolder.textBD.addTextChangedListener( new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
-        );
 
-        viewHolder.buttonFrequency.setOnClickListener (new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    TS.setFrequency(Integer.parseInt(viewHolder.textFrequency.getText().toString()));
-                }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
-        );
 
-        viewHolder.buttonUseIt.setOnClickListener (new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    MainActivity2.freq=TS.frequency;
-                    MainActivity2.duration=TS.duration;
-                }
+            @Override
+            public void afterTextChanged(Editable s) {
+                MainActivity2.transmitterSettingsList.get(position).setDuration(Float.parseFloat(viewHolder.textBD.getText().toString()));
+                MainActivity2.duration = TS.duration;
             }
-        );
+        });
+
+        viewHolder.textFrequency.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                //TS.setFrequency(Integer.parseInt(viewHolder.textFrequency.getText().toString()));
+                MainActivity2.transmitterSettingsList.get(position).setFrequency(Integer.parseInt(viewHolder.textFrequency.getText().toString()));
+                MainActivity2.freq = TS.frequency;
+            }
+        });
 
         viewHolder.buttonDelete.setOnClickListener (new View.OnClickListener()
             {
@@ -96,6 +105,18 @@ public class transmitterSettingsAdapter extends BaseAdapter {
                 public void onClick(View v)
                 {
                    MainActivity2.deleteSetting(position);
+                }
+            }
+        );
+
+        viewHolder.rb.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    MainActivity2.checkSetting(position);
+                    MainActivity2.freq=TS.frequency;
+                    MainActivity2.duration=TS.duration;
                 }
             }
         );
@@ -108,17 +129,18 @@ public class transmitterSettingsAdapter extends BaseAdapter {
     {
         return ((transmitterSetting) getItem(position));
     }
+
+
 }
 
 class ViewHolder {
-    final Button buttonBD, buttonFrequency, buttonDelete, buttonUseIt;
+    final Button buttonDelete; //buttonBD, buttonFrequency, buttonUseIt
     final TextView textBD, textFrequency;
+    final RadioButton rb;
     ViewHolder(View view){
-        buttonBD = view.findViewById(R.id.buttonBD);
-        buttonFrequency = view.findViewById(R.id.buttonFrequency);
         textBD = view.findViewById(R.id.textBD);
         textFrequency = view.findViewById(R.id.textFrequency);
         buttonDelete = view.findViewById(R.id.buttonDelete);
-        buttonUseIt = view.findViewById(R.id.buttonUseIt);
+        rb = view.findViewById(R.id.radioButton);
     }
 }

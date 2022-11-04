@@ -8,9 +8,12 @@ import android.media.AudioTrack;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.example.audiorecorder.application.SignalConstructor;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -25,6 +28,8 @@ public class MainActivity2 extends AppCompatActivity {
     double samples[] = new double[numSamples];
     short buffer[] = new short[numSamples];
     AudioTrack audioTrack;
+
+    SignalConstructor signalConstructor;
 
     static ArrayList<transmitterSetting> transmitterSettingsList = new ArrayList<transmitterSetting>();
     static transmitterSettingsAdapter transmitterSettingsAdapter;
@@ -52,7 +57,7 @@ public class MainActivity2 extends AppCompatActivity {
         TextView textToTransmit=(TextView) findViewById(R.id.textToTransmit);
         Button btnTransmit=(Button)findViewById(R.id.Transmit);
 
-        View.OnClickListener oclbtnTransmit=new View.OnClickListener()
+        View.OnClickListener oclbtnTransmit = new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -185,6 +190,14 @@ public class MainActivity2 extends AppCompatActivity {
 //        }
 //    }
 
+    public static void checkSetting(int Position)
+    {
+        for (transmitterSetting TS : transmitterSettingsList){
+            TS.setCheckedF(false);
+        }
+        transmitterSettingsList.get(Position).setCheckedF(true);
+        transmitterSettingsAdapter.notifyDataSetChanged();
+    }
 
     public void toTransmit(View view)
     {

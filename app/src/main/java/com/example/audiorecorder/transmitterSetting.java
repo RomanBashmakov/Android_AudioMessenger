@@ -4,6 +4,7 @@ public class transmitterSetting {
 
     int frequency;
     float duration;
+    boolean checkedF;
 
     transmitterSetting (int _frequency, float _duration)
     {
@@ -19,4 +20,7 @@ public class transmitterSetting {
         this.duration = duration;
     }
 
+    public void setCheckedF(boolean checkedF) {
+        this.checkedF = checkedF;
+    }
 }
