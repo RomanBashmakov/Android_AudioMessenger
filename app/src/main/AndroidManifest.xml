@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AudioRecorder">
         <activity
+            android:name=".ChatActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="false" />
         <activity

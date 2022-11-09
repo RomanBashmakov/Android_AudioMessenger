@@ -500,7 +500,7 @@ public class MainActivity extends Activity {
                     {
                         //showMessageDataSB.append("1");
                         //messageData.setText(showMessageDataSB.toString());
-                        datum = datum | (1 << (bitIndex1-1));
+                        datum = datum | (1 << (bitIndex1 - 1));
                     }
                     else
                     {

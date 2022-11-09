@@ -4,6 +4,7 @@
     <string name="SendMessage">Send message</string>
     <string name="Filter">Filter</string>
     <string name="SoundOptions">Transmitter settings</string>
+    <string name="ReceiverSettings">Receiver settings</string>
     <string name="app_name">AudioMessenger</string>
     <string name="record">Reception</string>
     <string name="play">Play</string>

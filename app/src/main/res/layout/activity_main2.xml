@@ -34,14 +34,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/start" />
+            android:text="@string/start"
+            android:layout_marginHorizontal="5dp"
+            android:background = "@drawable/roundedbutton"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
             android:layout_weight="1"
             android:onClick="stopTransmitting"
-            android:text="@string/stop" />
+            android:text="@string/stop"
+            android:background = "@drawable/roundedbutton" />
 
     </LinearLayout>
 
@@ -64,19 +68,6 @@
 
 
     </LinearLayout>
-
-
-    <LinearLayout
-        android:background="@color/MY"
-        app:layout_constrainedHeight="true"
-        android:orientation="horizontal"
-        android:id="@+id/layoutFilterBackground"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar"
-        app:layout_constraintBottom_toTopOf="@id/linearLayout2">
-    </LinearLayout>
-
 
     <LinearLayout
         android:orientation="horizontal"
@@ -106,7 +97,7 @@
             android:layout_weight="4"
             android:onClick="addSetting"
             android:text="+"
-            />
+            android:background = "@drawable/roundedbutton"/>
     </LinearLayout>
 
     <LinearLayout
@@ -121,16 +112,22 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:layout_marginVertical="5dp"
             android:layout_weight="1"
             android:onClick="toTransmit"
-            android:text="@string/Transmit" />
+            android:text="@string/Transmit"
+            android:background = "@drawable/roundedbutton" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginVertical="5dp"
+            android:layout_marginHorizontal="5dp"
             android:layout_weight="1"
             android:onClick="toReceive"
-            android:text="@string/Receive" />
+            android:text="@string/Receive"
+            android:background = "@drawable/roundedbutton"/>
     </LinearLayout>
 
 
@@ -150,7 +147,8 @@
             android:id="@+id/lvTransmitters"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:choiceMode="singleChoice"/>
+            android:choiceMode="singleChoice"
+            android:layout_marginVertical="2dp"/>
     </LinearLayout>
 
     <ProgressBar

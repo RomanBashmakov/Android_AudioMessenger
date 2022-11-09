@@ -28,7 +28,7 @@ public class SignalConstructor extends Thread {
 
     private List<Handler> handlers = new ArrayList<>();
 
-    public void SignalConstructor (StringBuffer _textBuffer,
+    public SignalConstructor (StringBuffer _textBuffer,
                                    boolean _preambulaF,
                                    int _sampleRate,
                                    int _freq,

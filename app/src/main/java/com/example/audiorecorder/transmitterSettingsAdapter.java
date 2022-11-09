@@ -1,6 +1,7 @@
 package com.example.audiorecorder;
 
 import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -17,8 +18,12 @@ public class transmitterSettingsAdapter extends BaseAdapter {
     Context ctx;
     LayoutInflater lInflater;
     ArrayList<transmitterSetting> objects;
+    SetTransmitterSettingCallback callback;
 
-    transmitterSettingsAdapter(Context context, ArrayList<transmitterSetting> transmitterSettingsList) {
+    transmitterSettingsAdapter(Context context,
+                               ArrayList<transmitterSetting> transmitterSettingsList,
+                               SetTransmitterSettingCallback setTransmitterSettingCallback) {
+        callback = setTransmitterSettingCallback;
         ctx = context;
         objects = transmitterSettingsList;
         lInflater = (LayoutInflater) ctx
@@ -77,7 +82,7 @@ public class transmitterSettingsAdapter extends BaseAdapter {
             @Override
             public void afterTextChanged(Editable s) {
                 MainActivity2.transmitterSettingsList.get(position).setDuration(Float.parseFloat(viewHolder.textBD.getText().toString()));
-                MainActivity2.duration = TS.duration;
+                callback.setBitDuration(TS.duration);
             }
         });
 
@@ -93,9 +98,8 @@ public class transmitterSettingsAdapter extends BaseAdapter {
             @Override
             public void afterTextChanged(Editable s)
             {
-                //TS.setFrequency(Integer.parseInt(viewHolder.textFrequency.getText().toString()));
                 MainActivity2.transmitterSettingsList.get(position).setFrequency(Integer.parseInt(viewHolder.textFrequency.getText().toString()));
-                MainActivity2.freq = TS.frequency;
+                callback.setFrequency(TS.frequency);
             }
         });
 
@@ -104,7 +108,7 @@ public class transmitterSettingsAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View v)
                 {
-                   MainActivity2.deleteSetting(position);
+                    callback.deleteSetting(position);
                 }
             }
         );
@@ -114,9 +118,9 @@ public class transmitterSettingsAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View v)
                 {
-                    MainActivity2.checkSetting(position);
-                    MainActivity2.freq=TS.frequency;
-                    MainActivity2.duration=TS.duration;
+                    callback.checkSetting(position);
+                    callback.setFrequency(TS.frequency);
+                    callback.setBitDuration(TS.duration);
                 }
             }
         );
@@ -129,8 +133,6 @@ public class transmitterSettingsAdapter extends BaseAdapter {
     {
         return ((transmitterSetting) getItem(position));
     }
-
-
 }
 
 class ViewHolder {
@@ -144,3 +146,4 @@ class ViewHolder {
         rb = view.findViewById(R.id.radioButton);
     }
 }
+
