@@ -16,29 +16,29 @@ import java.util.ArrayList;
 //Receiver
 public class MainActivity2 extends AppCompatActivity {
 
-    public static float duration = (float) 0.3; // duration of sound
+    public static float duration = (float) 0.3; // duration of a bit in sec
     public static int sampleRate = 44100; // Hz
     public static int freq = 500; // Hz
-    public static int numSamples = (int) (sampleRate * duration);// 1/10 - duration
+    public static int numSamples = (int) (sampleRate * duration);
 
     SignalConstructor signalConstructor;
 
     SetTransmitterSettingCallbackHere setTransmitterSettingCallback;
-    public class SetTransmitterSettingCallbackHere implements SetTransmitterSettingCallback{
-        @Override
-        public void setChosenTransmitterSetting() {
 
-        }
-
+    public class SetTransmitterSettingCallbackHere implements SetTransmitterSettingCallback
+    {
         @Override
-        public void deleteSetting(int Position) {
+        public void deleteSetting(int Position)
+        {
             transmitterSettingsList.remove(Position);
             transmitterSettingsAdapter.notifyDataSetChanged();
         }
 
         @Override
-        public void checkSetting(int Position) {
-            for (transmitterSetting TS : transmitterSettingsList){
+        public void checkSetting(int Position)
+        {
+            for (transmitterSetting TS : transmitterSettingsList)
+            {
                 TS.setCheckedF(false);
             }
             transmitterSettingsList.get(Position).setCheckedF(true);
@@ -46,13 +46,27 @@ public class MainActivity2 extends AppCompatActivity {
         }
 
         @Override
-        public void setBitDuration(float BD) {
+        public void setBitDuration(float BD)
+        {
             duration = BD;
         }
 
         @Override
-        public void setFrequency(int frequency) {
+        public void setFrequency(int frequency)
+        {
             freq = frequency;
+        }
+
+        @Override
+        public void newBDSetting(float typedBD, int Position)
+        {
+            transmitterSettingsList.get(Position).setDuration(typedBD);
+        }
+
+        @Override
+        public void newFrequencySetting(int typedFrequency, int Position)
+        {
+            transmitterSettingsList.get(Position).setFrequency(typedFrequency);
         }
     }
 

@@ -51,15 +51,8 @@ public class transmitterSettingsAdapter extends BaseAdapter {
     // пункт списка
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // используем созданные, но не используемые view
-//        View view = convertView;
 
         View view = lInflater.inflate(R.layout.transmitter_layout_settings, parent, false);
-
-//        if (view == null)
-//        {
-//            view = lInflater.inflate(R.layout.transmitter_layout_settings, parent, false);
-//        }
 
         ViewHolder viewHolder = new ViewHolder(view);
 
@@ -81,7 +74,7 @@ public class transmitterSettingsAdapter extends BaseAdapter {
 
             @Override
             public void afterTextChanged(Editable s) {
-                MainActivity2.transmitterSettingsList.get(position).setDuration(Float.parseFloat(viewHolder.textBD.getText().toString()));
+                callback.newBDSetting(Float.parseFloat(viewHolder.textBD.getText().toString()), position);
                 callback.setBitDuration(TS.duration);
             }
         });
@@ -98,7 +91,7 @@ public class transmitterSettingsAdapter extends BaseAdapter {
             @Override
             public void afterTextChanged(Editable s)
             {
-                MainActivity2.transmitterSettingsList.get(position).setFrequency(Integer.parseInt(viewHolder.textFrequency.getText().toString()));
+                callback.newFrequencySetting(Integer.parseInt(viewHolder.textFrequency.getText().toString()), position);
                 callback.setFrequency(TS.frequency);
             }
         });

@@ -148,6 +148,4 @@ public class SignalConstructor extends Thread {
         audioTrack.write(audioBufferShort, 0, audioBufferShort.length);
         audioTrack.play();
     }
-
-
 }
