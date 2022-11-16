@@ -23,31 +23,32 @@
             android:layout_weight="1">
 
             <LinearLayout
-                android:id="@+id/layoutFilterBackground"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/MY"
-                android:orientation="horizontal"
-                app:layout_constrainedHeight="true"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layoutTransmitterTitle">
-            </LinearLayout>
-
-
-            <LinearLayout
                 android:id="@+id/layoutTransmitterTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
+                android:layout_marginHorizontal="10dp"
                 android:layout_marginVertical="5dp"
                 android:orientation="horizontal"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:weightSum="5">
+
+                <Button
+                    android:id="@+id/toMenuFromSettings"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="24sp"
+                    android:background="@drawable/roundedbutton"
+                    android:onClick="toMenu"
+                    android:text="@string/toMenu" />
 
                 <TextView
                     android:id="@+id/Filter"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="3"
                     android:text="@string/SoundOptions"
                     android:textAlignment="center"
                     android:textColor="@color/black"
@@ -57,9 +58,10 @@
 
                 <Button
                     android:id="@+id/addSetting"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="4"
+                    android:layout_weight="1"
+                    android:textSize="24sp"
                     android:background="@drawable/roundedbutton"
                     android:onClick="addTransmitterSetting"
                     android:text="+" />
@@ -70,6 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="5dp"
                 android:layout_marginBottom="10dp"
                 app:layout_constrainedHeight="true"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -81,7 +84,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="2dp"
                     android:choiceMode="singleChoice"
-                    android:gravity="top" />
+                    android:gravity="top"
+                    android:background="@color/MY"/>
             </LinearLayout>
 
 
@@ -94,31 +98,34 @@
             android:layout_weight="1">
 
             <LinearLayout
-                android:id="@+id/layoutReceiverLVBackground"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/MY"
-                android:orientation="horizontal"
-                app:layout_constrainedHeight="true"
-                app:layout_constraintTop_toBottomOf="@id/layoutReceiverTitle"
-                app:layout_constraintBottom_toBottomOf="parent">
-
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/layoutReceiverTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginHorizontal="20dp"
+                android:layout_marginHorizontal="10dp"
                 android:layout_marginVertical="20dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:weightSum="5">
+
+                <LinearLayout
+                    android:id="@+id/layoutReceiverLVBackground"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    app:layout_constrainedHeight="true"
+                    app:layout_constraintTop_toBottomOf="@id/layoutReceiverTitle"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/ReceiverTitleText"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="3"
                     android:text="@string/ReceiverSettings"
                     android:textAlignment="center"
                     android:textColor="@color/black"
@@ -128,9 +135,10 @@
 
                 <Button
                     android:id="@+id/addReceiverSetting"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="4"
+                    android:layout_weight="1"
+                    android:textSize="24sp"
                     android:background="@drawable/roundedbutton"
                     android:onClick="addReceiverSetting"
                     android:text="+" />
@@ -151,9 +159,10 @@
                     android:id="@+id/lvReceivers"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="2dp"
+                    android:layout_marginVertical="5dp"
                     android:choiceMode="singleChoice"
-                    android:gravity="top" />
+                    android:gravity="top"
+                    android:background="@color/MY"/>
             </LinearLayout>
 
 

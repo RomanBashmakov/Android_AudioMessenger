@@ -1,12 +1,12 @@
 package com.example.audiorecorder;
 
-public class transmitterSetting {
+public class ReceiverSetting {
 
     int frequency;
     float duration;
     boolean checkedF;
 
-    transmitterSetting (int _frequency, float _duration)
+    ReceiverSetting (int _frequency, float _duration)
     {
         frequency = _frequency;
         duration = _duration;

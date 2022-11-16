@@ -37,7 +37,7 @@ public class MainActivity2 extends AppCompatActivity {
         @Override
         public void checkSetting(int Position)
         {
-            for (transmitterSetting TS : transmitterSettingsList)
+            for (TransmitterSetting TS : transmitterSettingsList)
             {
                 TS.setCheckedF(false);
             }
@@ -70,7 +70,7 @@ public class MainActivity2 extends AppCompatActivity {
         }
     }
 
-    static ArrayList<transmitterSetting> transmitterSettingsList = new ArrayList<transmitterSetting>();
+    static ArrayList<TransmitterSetting> transmitterSettingsList = new ArrayList<TransmitterSetting>();
     transmitterSettingsAdapter transmitterSettingsAdapter;
 
     @Override
@@ -114,7 +114,7 @@ public class MainActivity2 extends AppCompatActivity {
 
     public void addSetting(View view)
     {
-        transmitterSettingsList.add(new transmitterSetting(1000,(float) 0.3));
+        transmitterSettingsList.add(new TransmitterSetting(1000,(float) 0.3));
         transmitterSettingsAdapter.notifyDataSetChanged();
     }
 

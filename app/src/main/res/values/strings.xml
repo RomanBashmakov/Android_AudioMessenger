@@ -14,6 +14,14 @@
     <string name="Set_BandWidth">Set BW</string>
     <string name="Set_BitDuration">Set BD</string>
 
+
+    <string name="menuMessenger">  Messenger  </string>
+    <string name="menuSettings">  Settings  </string>
+    <string name="menuInstruction">  Instruction  </string>
+    <string name="menuSupportUs"> Support us </string>
+
+    <string name="toMenu">  menu  </string>
+
     <string name="GetFirstPermission">Mic</string>
     <string name="GetSecondPermission">Storage</string>
 

@@ -1,7 +1,6 @@
 package com.example.audiorecorder;
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -17,11 +16,11 @@ import java.util.ArrayList;
 public class transmitterSettingsAdapter extends BaseAdapter {
     Context ctx;
     LayoutInflater lInflater;
-    ArrayList<transmitterSetting> objects;
+    ArrayList<TransmitterSetting> objects;
     SetTransmitterSettingCallback callback;
 
     transmitterSettingsAdapter(Context context,
-                               ArrayList<transmitterSetting> transmitterSettingsList,
+                               ArrayList<TransmitterSetting> transmitterSettingsList,
                                SetTransmitterSettingCallback setTransmitterSettingCallback) {
         callback = setTransmitterSettingCallback;
         ctx = context;
@@ -56,7 +55,7 @@ public class transmitterSettingsAdapter extends BaseAdapter {
 
         ViewHolder viewHolder = new ViewHolder(view);
 
-        transmitterSetting TS = getTransmitterSetting(position);
+        TransmitterSetting TS = getTransmitterSetting(position);
 
         // заполняем View в пункте списка данными из настройки: частота, время бита
         viewHolder.textFrequency.setText(Integer.toString(TS.frequency));
@@ -122,9 +121,9 @@ public class transmitterSettingsAdapter extends BaseAdapter {
     }
 
     // настройки по позиции
-    transmitterSetting getTransmitterSetting(int position)
+    TransmitterSetting getTransmitterSetting(int position)
     {
-        return ((transmitterSetting) getItem(position));
+        return ((TransmitterSetting) getItem(position));
     }
 }
 
