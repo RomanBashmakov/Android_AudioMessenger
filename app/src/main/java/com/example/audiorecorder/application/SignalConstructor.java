@@ -43,7 +43,6 @@ public class SignalConstructor extends Thread {
         numSamples = (int) (sampleRate * duration);
         samples = new double[numSamples];
         buffer = new short[numSamples];
-        booleanList = new ArrayList<Boolean>(1000);//bits number
     }
 
     public void addHandler(Handler handler)
@@ -74,8 +73,9 @@ public class SignalConstructor extends Thread {
         }
 
         //booleanList initialization
-        for (int i = 0; i < 1000; ++i){
-            booleanList.set(i, false);
+        booleanList = new ArrayList<>();
+        for (int i = 0; i <= 1000; i++){
+            booleanList.add(false);
         }
 
         //text into bytes
