@@ -28,7 +28,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
+        setContentView(R.layout.settings_activity);
 
         setTransmitterSettingCallback = new SetTransmitterSettingCallbackHere();
         transmitterSettingsList = new ArrayList<TransmitterSetting>();
