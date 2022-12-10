@@ -19,6 +19,9 @@ public class transmitterSettingsAdapter extends BaseAdapter {
     ArrayList<TransmitterSetting> objects;
     SetTransmitterSettingCallback callback;
 
+    final int defaultFreq = 500;
+    final float defaultBD = (float) 0.3;
+
     transmitterSettingsAdapter(Context context,
                                ArrayList<TransmitterSetting> transmitterSettingsList,
                                SetTransmitterSettingCallback setTransmitterSettingCallback) {
@@ -73,8 +76,16 @@ public class transmitterSettingsAdapter extends BaseAdapter {
 
             @Override
             public void afterTextChanged(Editable s) {
-                callback.newBDSetting(Float.parseFloat(viewHolder.textBD.getText().toString()), position);
-                callback.setBitDuration(TS.duration);
+
+                try
+                {
+                    callback.newBDSetting(Float.parseFloat(viewHolder.textBD.getText().toString()), position);
+                    callback.setBitDuration(TS.duration);
+                }
+                catch (NumberFormatException e)
+                {
+                    callback.setBitDuration(defaultBD);
+                }
             }
         });
 
@@ -90,8 +101,15 @@ public class transmitterSettingsAdapter extends BaseAdapter {
             @Override
             public void afterTextChanged(Editable s)
             {
-                callback.newFrequencySetting(Integer.parseInt(viewHolder.textFrequency.getText().toString()), position);
-                callback.setFrequency(TS.frequency);
+                try
+                {
+                    callback.newFrequencySetting(Integer.parseInt(viewHolder.textFrequency.getText().toString()), position);
+                    callback.setFrequency(TS.frequency);
+                }
+                catch (NumberFormatException e)
+                {
+                    callback.setFrequency(defaultFreq);
+                }
             }
         });
 

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChatActivity">
+    tools:context=".SettingsActivity"
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,41 +14,61 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:weightSum="21">
 
         <LinearLayout
+            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="10dp">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:text="Permissions"
+                android:textSize="24sp"
+                android:textColor="@color/black"
+                android:gravity="center"/>
 
             <Button
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:id="@+id/button3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="5dp"
+                android:gravity="left|center"
+                android:drawablePadding="5dp"
                 android:onClick="getMicPermission"
                 android:text="@string/GetFirstPermission"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:layout_editor_absoluteY="48dp"
-                app:layout_constraintTop_toBottomOf="@id/Permissions"/>
+                android:background="@null"
+                android:drawableLeft="@drawable/button_to_mic"
+                android:textSize="14sp"/>
 
             <Button
-                android:layout_weight="1"
+                android:layout_marginHorizontal="2dp"
+                android:layout_weight="2"
                 android:id="@+id/button2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:onClick="getStoragePermission"
                 android:text="@string/GetSecondPermission"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/button3"
-                tools:layout_editor_absoluteY="40dp" />
+                android:textSize="14sp"
+                android:paddingHorizontal="5dp"
+                android:gravity="left|center"
+                android:drawablePadding="5dp"
+                android:background="@null"
+                android:drawableLeft="@drawable/button_to_storage"/>
 
         </LinearLayout>
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_height="0dp"
+            android:layout_weight="10">
 
             <LinearLayout
                 android:id="@+id/layoutTransmitterTitle"
@@ -61,15 +82,30 @@
                 app:layout_constraintTop_toTopOf="parent"
                 android:weightSum="5">
 
-                <Button
-                    android:id="@+id/toMenuFromSettings"
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:textSize="24sp"
-                    android:background="@drawable/roundedbutton"
-                    android:onClick="toMenu"
-                    android:text="@string/toMenu" />
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:weightSum="3">
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/toMenuFromSettings"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="24sp"
+                        android:background="@color/white"
+                        android:onClick="toMenu"
+                        android:drawableLeft="@drawable/button_to_menu"
+                        style="?android:attr/buttonBarButtonStyle"/>
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/Filter"
@@ -83,15 +119,31 @@
                     app:layout_constraintTop_toBottomOf="@+id/sentPacketsCounter"
                     tools:layout_editor_absoluteX="10dp" />
 
-                <Button
-                    android:id="@+id/addSetting"
+
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:textSize="24sp"
-                    android:background="@drawable/roundedbutton"
-                    android:onClick="addTransmitterSetting"
-                    android:text="+" />
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:weightSum="3">
+                    </LinearLayout>
+
+                        <Button
+                            android:id="@+id/addSetting"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:background="@color/white"
+                            android:onClick="addTransmitterSetting"
+                            android:drawableLeft="@drawable/button_to_add_circle"
+                            style="?android:attr/buttonBarButtonStyle"/>
+                </LinearLayout>
+
             </LinearLayout>
 
             <LinearLayout
@@ -120,8 +172,8 @@
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_height="0dp"
+            android:layout_weight="10">
 
             <LinearLayout
                 android:id="@+id/layoutReceiverTitle"
@@ -159,15 +211,32 @@
                     app:layout_constraintTop_toBottomOf="@+id/sentPacketsCounter"
                     tools:layout_editor_absoluteX="10dp" />
 
-                <Button
-                    android:id="@+id/addReceiverSetting"
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:textSize="24sp"
-                    android:background="@drawable/roundedbutton"
-                    android:onClick="addReceiverSetting"
-                    android:text="+" />
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:weightSum="3">
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/addReceiverSetting"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="24sp"
+                        android:background="@drawable/roundedbutton"
+                        android:onClick="addReceiverSetting"
+                        android:drawableLeft="@drawable/button_to_add_circle"
+                        style="?android:attr/buttonBarButtonStyle"/>
+                </LinearLayout>
+
+
             </LinearLayout>
 
             <LinearLayout

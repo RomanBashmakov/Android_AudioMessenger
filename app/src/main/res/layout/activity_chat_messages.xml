@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChatMessages">
+    tools:context=".ChatMessagesActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,49 +13,10 @@
         android:weightSum = "9" >
 
         <android.support.constraint.ConstraintLayout
-            android:id="@+id/topLayout"
-            android:layout_height="0dp"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <LinearLayout
-                android:id="@+id/topButtonsLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <Button
-                    android:id="@+id/ClearTopButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/roundedbutton"
-                    android:text="@string/start" />
-
-                <Button
-                    android:id="@+id/toMenuTopButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/roundedbutton"
-                    android:text="@string/stop" />
-
-            </LinearLayout>
-
-        </android.support.constraint.ConstraintLayout>
-
-        <android.support.constraint.ConstraintLayout
             android:id="@+id/messagesLayout"
             android:layout_height="0dp"
             android:layout_width="match_parent"
-            android:layout_weight="8"
+            android:layout_weight="9"
             app:layout_constraintTop_toTopOf="parent"
             android:gravity="top">
 
@@ -108,7 +69,7 @@
                     android:layout_weight="1"
                     android:text="@string/start"
                     android:layout_marginHorizontal="5dp"
-                    android:background = "@drawable/roundedbutton"/>
+                    android:background = "@drawable/button_background"/>
 
                 <Button
                     android:layout_width="match_parent"
@@ -117,7 +78,7 @@
                     android:layout_weight="1"
                     android:onClick="stopTransmitting"
                     android:text="@string/stop"
-                    android:background = "@drawable/roundedbutton" />
+                    android:background = "@drawable/button_background" />
 
             </LinearLayout>
 

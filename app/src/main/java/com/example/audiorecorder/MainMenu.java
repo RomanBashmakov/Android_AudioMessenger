@@ -15,13 +15,13 @@ public class MainMenu extends AppCompatActivity {
 
     public void toMessenger(View view)
     {
-        Intent intent = new Intent(this, ChatMessages.class);
+        Intent intent = new Intent(this, ChatMessagesActivity.class);
         startActivity(intent);
     }
 
     public void toChatActivity(View view)
     {
-        Intent intent = new Intent(this, ChatActivity.class);
+        Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
 

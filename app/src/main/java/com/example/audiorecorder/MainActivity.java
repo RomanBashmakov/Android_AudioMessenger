@@ -44,7 +44,6 @@ public class MainActivity extends Activity {
     BandPass bandpass;
     float[] floatedValues;
     float[] movingAverageValues;
-    String recordedValues;
     StringBuilder showPacketsSB;
     StringBuilder showMessageSB;
     StringBuilder showMessageDataSB;
@@ -59,7 +58,6 @@ public class MainActivity extends Activity {
     ArrayList<Boolean> bitsInMessage1 = new ArrayList<>(1000);
     ArrayList<Boolean> bitsInMessage2 = new ArrayList<>(1000);
     int bitIndex1 = 0;//the last and current index
-    int bitIndex2 = 0;//the last and current index for shifted measurement
 
     int sampleIndex = 0;//the last and current index when preambula is detected
     int sampleIndex1 = 0;//the last and current index for non-shifted measurement
@@ -167,21 +165,21 @@ public class MainActivity extends Activity {
         super.onDestroy();
     }
 
-    public void getMicPermission(View v) {
-        ActivityCompat.requestPermissions(this,
-                new String[]
-                        {
-                                Manifest.permission.RECORD_AUDIO
-                        }, RECORD_AUDIO_REQUEST_CODE); // your request code
-    }
-
-    public void getStoragePermission(View v) {
-        ActivityCompat.requestPermissions(this,
-                new String[]
-                        {
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        }, REQUEST_WRITE_STORAGE_REQUEST_CODE); // your request code
-    }
+//    public void getMicPermission(View v) {
+//        ActivityCompat.requestPermissions(this,
+//                new String[]
+//                        {
+//                                Manifest.permission.RECORD_AUDIO
+//                        }, RECORD_AUDIO_REQUEST_CODE); // your request code
+//    }
+//
+//    public void getStoragePermission(View v) {
+//        ActivityCompat.requestPermissions(this,
+//                new String[]
+//                        {
+//                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+//                        }, REQUEST_WRITE_STORAGE_REQUEST_CODE); // your request code
+//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,

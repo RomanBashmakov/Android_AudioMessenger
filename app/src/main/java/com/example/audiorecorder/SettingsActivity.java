@@ -1,17 +1,31 @@
 package com.example.audiorecorder;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-public class ChatActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     public static float duration = (float) 0.3; // duration of a bit in sec
     public static int freq = 500; // Hz
+
+    int REQUEST_WRITE_STORAGE_REQUEST_CODE = 1;
+    int REQUEST_READ_STORAGE_REQUEST_CODE = 2;
+    int RECORD_AUDIO_REQUEST_CODE = 3;
 
     ArrayList<TransmitterSetting> transmitterSettingsList;
     transmitterSettingsAdapter transmitterSettingsAdapter;
@@ -28,10 +42,11 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_activity);
+        setContentView(R.layout.activity_settings);
 
         setTransmitterSettingCallback = new SetTransmitterSettingCallbackHere();
-        transmitterSettingsList = new ArrayList<TransmitterSetting>();
+        loadData();
+//        transmitterSettingsList = new ArrayList<TransmitterSetting>();
         lvTransmitters = (ListView) findViewById(R.id.lvTransmitters);
         transmitterSettingsAdapter = new transmitterSettingsAdapter(this, transmitterSettingsList, setTransmitterSettingCallback);
         lvTransmitters.setAdapter(transmitterSettingsAdapter);
@@ -41,6 +56,33 @@ public class ChatActivity extends AppCompatActivity {
         lvReceivers = (ListView) findViewById(R.id.lvReceivers);
         receiverSettingsAdapter = new receiverSettingsAdapter(this, receiverSettingsList, setReceiverSettingCallback);
         lvReceivers.setAdapter(receiverSettingsAdapter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveData();
+    }
+
+    private void saveData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(transmitterSettingsList);
+        editor.putString("task list", json);
+        editor.apply();
+    }
+
+    private void loadData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("task list", null);
+        Type type = new TypeToken<ArrayList<TransmitterSetting>>() {}.getType();
+        transmitterSettingsList = gson.fromJson(json, type);
+
+        if (transmitterSettingsList == null) {
+            transmitterSettingsList = new ArrayList<>();
+        }
     }
 
     public void addTransmitterSetting(View view)
@@ -134,6 +176,67 @@ public class ChatActivity extends AppCompatActivity {
         @Override
         public void newFrequencySetting(int typedFrequency, int Position) {
             receiverSettingsList.get(Position).setFrequency(typedFrequency);
+        }
+    }
+
+    public void getMicPermission(View view) {
+        ActivityCompat.requestPermissions(this,
+                new String[]
+                        {
+                                Manifest.permission.RECORD_AUDIO
+                        }, RECORD_AUDIO_REQUEST_CODE); // your request code
+    }
+
+    public void getStoragePermission(View view) {
+        ActivityCompat.requestPermissions(this,
+                new String[]
+                        {
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        }, REQUEST_WRITE_STORAGE_REQUEST_CODE); // your request code
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode,
+                permissions,
+                grantResults);
+
+        if (requestCode == REQUEST_WRITE_STORAGE_REQUEST_CODE)
+        {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                Toast.makeText(SettingsActivity.this, "WRITE_STORAGE Permission Granted", Toast.LENGTH_SHORT) .show();
+            }
+            else
+            {
+                Toast.makeText(SettingsActivity.this, "WRITE_STORAGE Permission Denied", Toast.LENGTH_SHORT) .show();
+            }
+        }
+        else if (requestCode == REQUEST_READ_STORAGE_REQUEST_CODE)
+        {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                Toast.makeText(SettingsActivity.this, "READ_STORAGE Permission Granted", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(SettingsActivity.this, "READ_STORAGE Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (requestCode == RECORD_AUDIO_REQUEST_CODE)
+        {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                Toast.makeText(SettingsActivity.this, "RECORD_AUDIO_REQUEST_CODE Permission Granted", Toast.LENGTH_SHORT).show();
+            } else
+            {
+                Toast.makeText(SettingsActivity.this, "RECORD_AUDIO_REQUEST_CODE Permission Denied", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

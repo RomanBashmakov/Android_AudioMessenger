@@ -1,6 +1,7 @@
 package com.example.audiorecorder;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,15 +19,11 @@ import com.example.audiorecorder.application.SignalConstructor;
 
 import java.util.ArrayList;
 
-public class SettingsActivity extends AppCompatActivity {
+public class ChatMessagesActivity extends AppCompatActivity {
 
     public static float duration = (float) 0.3; // duration of a bit in sec
     public static int sampleRate = 44100; // Hz
     public static int freq = 500; // Hz
-
-    int REQUEST_WRITE_STORAGE_REQUEST_CODE = 1;
-    int REQUEST_READ_STORAGE_REQUEST_CODE = 2;
-    int RECORD_AUDIO_REQUEST_CODE = 3;
 
     ListView lvMessages;
     Button btnTransmit;
@@ -57,7 +54,33 @@ public class SettingsActivity extends AppCompatActivity {
         myMessagesAdapter = new MyMessagesAdapter(this, messagesList, new MyMessagesAdapterCallbackHere());
         lvMessages.setAdapter(myMessagesAdapter);
 
-        recordStart();//Start "listening" to
+        h = new Handler(Looper.getMainLooper()) {
+            public void handleMessage(android.os.Message msg)
+            {
+                if(msg.what == amplitudeReader.THREAD_END)
+                {
+                    amplitudeReader.interrupt();
+                }
+                else if(msg.what == amplitudeReader.MSG_ERROR)
+                {
+                    Toast.makeText(ChatMessagesActivity.this, "RECORD_AUDIO Permission not Granted. Input messages cannot be recognized", Toast.LENGTH_LONG).show();
+                }
+                else
+                {
+                    addReceivedMessage((String) msg.obj);
+                }
+            }
+        };
+
+        try
+        {
+            recordStart();//Start "listening" to
+        }
+        catch (Throwable t)
+        {
+            Toast.makeText(ChatMessagesActivity.this, "RECORD_AUDIO Permission not Granted", Toast.LENGTH_LONG).show();
+            toMenu();
+        }
 
         View.OnClickListener oclbtnTransmit = new View.OnClickListener()
         {
@@ -76,20 +99,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         };
         btnTransmit.setOnClickListener(oclbtnTransmit);
-
-        h = new Handler(Looper.getMainLooper()) {
-            public void handleMessage(android.os.Message msg)
-            {
-                if(msg.what == amplitudeReader.THREAD_END)
-                {
-                    amplitudeReader.interrupt();
-                }
-                else
-                {
-                    addReceivedMessage((String) msg.obj);
-                }
-            }
-        };
     }
 
     public void addReceivedMessage (String newMessage)
@@ -135,67 +144,10 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-
-
-    public void getMicPermission(View view) {
-        ActivityCompat.requestPermissions(this,
-                new String[]
-                        {
-                                Manifest.permission.RECORD_AUDIO
-                        }, RECORD_AUDIO_REQUEST_CODE); // your request code
-    }
-
-    public void getStoragePermission(View view) {
-        ActivityCompat.requestPermissions(this,
-                new String[]
-                        {
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        }, REQUEST_WRITE_STORAGE_REQUEST_CODE); // your request code
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults)
+    public void toMenu()
     {
-        super.onRequestPermissionsResult(requestCode,
-                permissions,
-                grantResults);
-
-        if (requestCode == REQUEST_WRITE_STORAGE_REQUEST_CODE)
-        {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            {
-                Toast.makeText(SettingsActivity.this, "WRITE_STORAGE Permission Granted", Toast.LENGTH_SHORT) .show();
-            }
-            else
-            {
-                Toast.makeText(SettingsActivity.this, "WRITE_STORAGE Permission Denied", Toast.LENGTH_SHORT) .show();
-            }
-        }
-        else if (requestCode == REQUEST_READ_STORAGE_REQUEST_CODE)
-        {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            {
-                Toast.makeText(SettingsActivity.this, "READ_STORAGE Permission Granted", Toast.LENGTH_SHORT).show();
-            }
-            else
-            {
-                Toast.makeText(SettingsActivity.this, "READ_STORAGE Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else if (requestCode == RECORD_AUDIO_REQUEST_CODE)
-        {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            {
-                Toast.makeText(SettingsActivity.this, "RECORD_AUDIO_REQUEST_CODE Permission Granted", Toast.LENGTH_SHORT).show();
-            } else
-            {
-                Toast.makeText(SettingsActivity.this, "RECORD_AUDIO_REQUEST_CODE Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-        }
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
 }

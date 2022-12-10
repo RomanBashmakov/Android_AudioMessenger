@@ -18,34 +18,49 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="7"
             android:orientation="vertical"
             android:weightSum="3">
 
             <TextView
                 android:id="@+id/textMessage"
+                android:textSize="24sp"
                 android:textColor="@color/black"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="2"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textAlignment="viewEnd"/>
 
             <TextView
                 android:id="@+id/textData"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textAlignment="viewEnd"/>
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/buttonDeleteMessage"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="X"/>
+            android:layout_gravity="center"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/buttonDeleteMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:drawableLeft="@drawable/button_to_delete"
+                android:gravity="center"
+                android:minHeight="0dp"
+                android:minWidth="0dp"/>
+        </LinearLayout>
 
     </LinearLayout>
 
