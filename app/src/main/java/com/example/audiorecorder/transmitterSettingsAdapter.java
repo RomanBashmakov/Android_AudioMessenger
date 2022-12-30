@@ -131,6 +131,7 @@ public class transmitterSettingsAdapter extends BaseAdapter {
                     callback.checkSetting(position);
                     callback.setFrequency(TS.frequency);
                     callback.setBitDuration(TS.duration);
+                    callback.saveSetting(position);
                 }
             }
         );

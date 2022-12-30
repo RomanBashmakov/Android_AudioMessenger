@@ -1,18 +1,18 @@
 package com.example.audiorecorder;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+
+import android.content.ContextWrapper;
+import android.content.*;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.os.Handler;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.util.Log;
 
-import com.example.audiorecorder.application.GlobalApplication;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +27,6 @@ public class AmplitudeReader extends Thread {
     StringBuilder showMessageDataSB;
     int datum = 0;
 
-    int dataSampleRate = MainActivity2.sampleRate;
     int filterFrequency = 500;
     int filterBW = 100;
     float movingAverageAccumulatorPrevious = 0; //sum of 'window' elements
@@ -39,7 +38,6 @@ public class AmplitudeReader extends Thread {
     int sampleIndex2 = 0;//the last and current index for shifted measurement
     float bitThreshold = 1000;//to compare with
     int numberToEnd = 0;//between the last measurement and bufLength
-    int numSamples = 0;//between the measurements
     boolean isPreambula = false;// if preambula is detected = true
 
     boolean isBufferEnd = false;// if buffer end is riched = true
@@ -50,13 +48,15 @@ public class AmplitudeReader extends Thread {
     int preambulaCounter2 = 0;
 //From the previous receiver
 
-
     private AudioRecord audioRecord;
     private int bufflen;
     private static final int SAMPPERSEC = 44100;
     private final int BUFF_COUNT = 32;
 
-    boolean mIsRunning;
+    int dataSampleRate = SAMPPERSEC;
+    int numSamples = (int) (duration * SAMPPERSEC);//between the measurements
+
+    static boolean mIsRunning;
     final int MSG_DATA = 101;
     final int THREAD_END = 102;
     final int MSG_ERROR = 113;
@@ -66,10 +66,19 @@ public class AmplitudeReader extends Thread {
 
     private List<Handler> handlers = new ArrayList<>();
 
-    public AmplitudeReader()
+    public AmplitudeReader(ReceiverSetting receiverSetting)
     {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
         bufflen = AudioRecord.getMinBufferSize(SAMPPERSEC, channelConfiguration, audioEncoding);
+
+        showMessageDataSB = new StringBuilder();
+
+        if (receiverSetting != null)
+        {
+            duration = receiverSetting.duration;
+            filterFrequency = receiverSetting.frequency;
+            numSamples = (int) (duration * SAMPPERSEC);
+        }
     }
 
     public void addHandler(Handler handler)
@@ -98,7 +107,6 @@ public class AmplitudeReader extends Thread {
                 bufflen*10
         );
 
-
         mIsRunning = true;
         try
         {
@@ -109,6 +117,8 @@ public class AmplitudeReader extends Thread {
             messageError();
             stopRecording();
         }
+
+
         int count = 0;
         while(mIsRunning)
         {
@@ -126,6 +136,7 @@ public class AmplitudeReader extends Thread {
             }
 
             // посылаем оповещение обработчикам
+            // Log.d("myTag", "saveFile " + Integer.toString(count));
             saveFile(buffers[count]);//!!! новое
 
             count = (count + 1) % BUFF_COUNT;
@@ -148,6 +159,7 @@ public class AmplitudeReader extends Thread {
         finally
         {
             // освобождаем ресурсы
+            //Log.d("myTag", "finally audioRecord.release");
             audioRecord.release();
             audioRecord = null;
         }
@@ -155,6 +167,7 @@ public class AmplitudeReader extends Thread {
 
     private void sendMsg(String data)
     {
+        Log.d("msg", "msg 1");
         for(Handler handler : handlers)
         {
             handler.sendMessage(handler.obtainMessage(MSG_DATA, data));
@@ -184,38 +197,39 @@ public class AmplitudeReader extends Thread {
         }
 
         //moving average for the filtered data
-        int movingAverageW=200; //window
-        float movingAverageAccumulator=0; //sum of 'window' elements
-        for (int i=0; i<(floatedValues.length); i++)
+        int movingAverageW = 200; //window
+        float movingAverageAccumulator = 0; //sum of 'window' elements
+        for (int i = 0; i < (floatedValues.length); i++)
         {
-            if(((i-movingAverageW/2)>=0)&&((i+movingAverageW/2)<floatedValues.length))
+            if((( i-movingAverageW/2 ) >= 0) && (( i + movingAverageW/2) < floatedValues.length))
             {
                 for(int w=0; w<=movingAverageW; w++)
                 {
-                    movingAverageAccumulator+=floatedValues[i-movingAverageW/2+w];
+                    movingAverageAccumulator += floatedValues [i - movingAverageW/2 + w];
                 }
-                movingAverageValues[i]=movingAverageAccumulator/movingAverageW;
-                movingAverageAccumulator=0; //sum of 'window' elements
-                movingAverageAccumulatorPrevious=movingAverageValues[i];
+                movingAverageValues[i] = movingAverageAccumulator/movingAverageW;
+                movingAverageAccumulator = 0; //sum of 'window' elements
+                movingAverageAccumulatorPrevious = movingAverageValues[i];
             }
             else
             {
-                movingAverageValues[i]=movingAverageAccumulatorPrevious;
+                movingAverageValues[i] = movingAverageAccumulatorPrevious;
             }
         }
 
         //1 Looking for preambula. Non-shifted
-        if(!isPreambula)
+        if ( !isPreambula )
         {
             while( !isBufferEnd1 && !isPreambula )
             {
                 if ((preambulaCounter1 % 2) == 0)
                 {
-                    if ( sampleIndex1 < file.length)
+                    if ( sampleIndex1 < file.length )
                     {
-                        if (movingAverageValues[sampleIndex1] > bitThreshold)
+                        if ( movingAverageValues[sampleIndex1] > bitThreshold )
                         {
                             preambulaCounter1++;
+                            //Log.d("Preambula", "Preambula1 " + Integer.toString(preambulaCounter1));
                         }
                         else
                         {
@@ -231,11 +245,12 @@ public class AmplitudeReader extends Thread {
                 }
                 else
                 {
-                    if ( sampleIndex1 < file.length)
+                    if ( sampleIndex1 < file.length )
                     {
-                        if (movingAverageValues[sampleIndex1] < bitThreshold)
+                        if ( movingAverageValues[sampleIndex1] < bitThreshold )
                         {
                             preambulaCounter1++;
+                            //Log.d("Preambula", "Preambula1 " + Integer.toString(preambulaCounter1));
                         }
                         else
                         {
@@ -285,9 +300,13 @@ public class AmplitudeReader extends Thread {
                 {
                     if ( sampleIndex2 < file.length)
                     {
-                        if (movingAverageValues[sampleIndex2] > bitThreshold) {
+                        if (movingAverageValues[sampleIndex2] > bitThreshold)
+                        {
                             preambulaCounter2++;
-                        } else {
+                            //Log.d("Preambula", "Preambula2 " + Integer.toString(preambulaCounter2));
+                        }
+                        else
+                        {
                             preambulaCounter2 = 0;
                         }
                     }
@@ -305,6 +324,7 @@ public class AmplitudeReader extends Thread {
                         if(movingAverageValues[sampleIndex2] < bitThreshold)
                         {
                             preambulaCounter2++;
+                            //Log.d("Preambula", "Preambula2 " + Integer.toString(preambulaCounter2));
                         }
                         else
                         {
@@ -362,6 +382,7 @@ public class AmplitudeReader extends Thread {
                         showMessageDataSB.append( (char) datum );
 
                         messageBuilder(showMessageDataSB);//!!! НОВОЕ
+                        //Log.d("myTag", String.valueOf(showMessageDataSB));
 
                         bitIndex1 = 0;
                         datum = 0;
@@ -401,10 +422,12 @@ public class AmplitudeReader extends Thread {
 
     void messageBuilder(StringBuilder inputSB)
     {
-        if (inputSB.length()==3)
+        if ( inputSB.length() >= 3 )
         {
+            Log.d("myTag", String.valueOf(inputSB));
             sendMsg(inputSB.toString());
             isPreambula = false;
+            showMessageDataSB = new StringBuilder();
         }
     }
 

@@ -46,13 +46,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         setTransmitterSettingCallback = new SetTransmitterSettingCallbackHere();
         loadData();
-//        transmitterSettingsList = new ArrayList<TransmitterSetting>();
         lvTransmitters = (ListView) findViewById(R.id.lvTransmitters);
         transmitterSettingsAdapter = new transmitterSettingsAdapter(this, transmitterSettingsList, setTransmitterSettingCallback);
         lvTransmitters.setAdapter(transmitterSettingsAdapter);
 
         setReceiverSettingCallback = new SetReceiverSettingCallbackHere();
-        receiverSettingsList = new ArrayList<ReceiverSetting>();
         lvReceivers = (ListView) findViewById(R.id.lvReceivers);
         receiverSettingsAdapter = new receiverSettingsAdapter(this, receiverSettingsList, setReceiverSettingCallback);
         lvReceivers.setAdapter(receiverSettingsAdapter);
@@ -65,23 +63,40 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void saveData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("transmitter settings", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(transmitterSettingsList);
-        editor.putString("task list", json);
+        editor.putString("transmitters list", json);
+        editor.apply();
+
+        sharedPreferences = getSharedPreferences("receiver settings", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        gson = new Gson();
+        json = gson.toJson(receiverSettingsList);
+        editor.putString("receivers list", json);
         editor.apply();
     }
 
     private void loadData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("transmitter settings", MODE_PRIVATE);
         Gson gson = new Gson();
-        String json = sharedPreferences.getString("task list", null);
+        String json = sharedPreferences.getString("transmitters list", null);
         Type type = new TypeToken<ArrayList<TransmitterSetting>>() {}.getType();
         transmitterSettingsList = gson.fromJson(json, type);
 
         if (transmitterSettingsList == null) {
             transmitterSettingsList = new ArrayList<>();
+        }
+
+        sharedPreferences = getSharedPreferences("receiver settings", MODE_PRIVATE);
+        gson = new Gson();
+        json = sharedPreferences.getString("receivers list", null);
+        type = new TypeToken<ArrayList<ReceiverSetting>>() {}.getType();
+        receiverSettingsList = gson.fromJson(json, type);
+
+        if (receiverSettingsList == null) {
+            receiverSettingsList = new ArrayList<>();
         }
     }
 
@@ -121,6 +136,16 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         @Override
+        public void saveSetting(int Position) {
+            SharedPreferences sharedPreferences = getSharedPreferences("saved transmitter setting", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            Gson gson = new Gson();
+            String json = gson.toJson(transmitterSettingsList.get(Position));
+            editor.putString("transmitter setting", json);
+            editor.apply();
+        }
+
+        @Override
         public void setBitDuration(float BD) {
             duration = BD;
         }
@@ -156,6 +181,16 @@ public class SettingsActivity extends AppCompatActivity {
             }
             receiverSettingsList.get(Position).setCheckedF(true);
             receiverSettingsAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void saveSetting(int Position) {
+            SharedPreferences sharedPreferences = getSharedPreferences("saved receiver setting", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            Gson gson = new Gson();
+            String json = gson.toJson(receiverSettingsList.get(Position));
+            editor.putString("receiver setting", json);
+            editor.apply();
         }
 
         @Override

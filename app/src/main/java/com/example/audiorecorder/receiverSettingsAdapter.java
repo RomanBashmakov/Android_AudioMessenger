@@ -113,6 +113,7 @@ public class receiverSettingsAdapter extends BaseAdapter {
                                                          callback.checkSetting(position);
                                                          callback.setFrequency(RS.frequency);
                                                          callback.setBitDuration(RS.duration);
+                                                         callback.saveSetting(position);
                                                      }
                                                  }
         );

@@ -1,6 +1,7 @@
 package com.example.audiorecorder;
 
 import android.content.Context;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +56,14 @@ public class MyMessagesAdapter extends BaseAdapter {
         MyMessage oneMessage = getOneMessage(position);
 
         // заполняем View в пункте списка данными из настройки: частота, время бита
+        if (oneMessage.input0output1)
+        {
+            viewHolder.textMessage.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+        }
+        else
+        {
+            viewHolder.textMessage.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
+        }
         viewHolder.textMessage.setText(oneMessage.messageData);
         //viewHolder.textData.setText(oneMessage);
 

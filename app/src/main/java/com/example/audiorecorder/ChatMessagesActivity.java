@@ -1,14 +1,12 @@
 package com.example.audiorecorder;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -16,7 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.audiorecorder.application.SignalConstructor;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class ChatMessagesActivity extends AppCompatActivity {
@@ -44,6 +45,8 @@ public class ChatMessagesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_messages);
 
+        loadTransmitterSetting();
+
         //take all the text to transmit
         textToTransmit = findViewById(R.id.textToTransmit);
         btnTransmit = findViewById(R.id.Transmit);
@@ -54,14 +57,15 @@ public class ChatMessagesActivity extends AppCompatActivity {
         myMessagesAdapter = new MyMessagesAdapter(this, messagesList, new MyMessagesAdapterCallbackHere());
         lvMessages.setAdapter(myMessagesAdapter);
 
-        h = new Handler(Looper.getMainLooper()) {
+        h = new Handler (Looper.getMainLooper()) {
             public void handleMessage(android.os.Message msg)
             {
-                if(msg.what == amplitudeReader.THREAD_END)
+                Log.d("msg", "msg 2");
+                if (msg.what == amplitudeReader.THREAD_END)
                 {
                     amplitudeReader.interrupt();
                 }
-                else if(msg.what == amplitudeReader.MSG_ERROR)
+                else if (msg.what == amplitudeReader.MSG_ERROR)
                 {
                     Toast.makeText(ChatMessagesActivity.this, "RECORD_AUDIO Permission not Granted. Input messages cannot be recognized", Toast.LENGTH_LONG).show();
                 }
@@ -74,7 +78,7 @@ public class ChatMessagesActivity extends AppCompatActivity {
 
         try
         {
-            recordStart();//Start "listening" to
+            recordStart();//Start "listening"
         }
         catch (Throwable t)
         {
@@ -101,29 +105,67 @@ public class ChatMessagesActivity extends AppCompatActivity {
         btnTransmit.setOnClickListener(oclbtnTransmit);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+
+    }
+
+
+    public ReceiverSetting loadReceiverSetting() {
+        SharedPreferences sharedPreferences = getSharedPreferences("saved receiver setting", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("receiver setting", null);
+        Type type = new TypeToken<ReceiverSetting>() {}.getType();
+        ReceiverSetting receiverSetting = gson.fromJson(json, type);
+        return receiverSetting;
+    }
+
+    public void loadTransmitterSetting()
+    {
+        SharedPreferences sharedPreferences = getSharedPreferences("saved transmitter setting", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("transmitter setting", null);
+        Type type = new TypeToken<TransmitterSetting>() {}.getType();
+        TransmitterSetting transmitterSetting = gson.fromJson(json, type);
+
+        if (transmitterSetting != null)
+        {
+            duration = transmitterSetting.duration;
+            freq = transmitterSetting.frequency;
+        }
+    }
+
     public void addReceivedMessage (String newMessage)
     {
-        messagesList.add(new MyMessage(newMessage));
+        Log.d("msg", "msg 3" + newMessage);
+
+        messagesList.add(new MyMessage(newMessage, false));
         myMessagesAdapter.notifyDataSetChanged();
     }
 
     public void addTransmittedMessage(String newMessage)
     {
-        messagesList.add(new MyMessage(newMessage));
+        messagesList.add(new MyMessage(newMessage, true));
         myMessagesAdapter.notifyDataSetChanged();
     }
 
     public void recordStart()
     {
-        amplitudeReader = new AmplitudeReader();
-        amplitudeReader.addHandler(h);
-        amplitudeReader.start();
+        if (AmplitudeReader.mIsRunning == false)
+        {
+            amplitudeReader = new AmplitudeReader(loadReceiverSetting());
+            amplitudeReader.addHandler(h);
+            amplitudeReader.start();
+        }
     }
 
     public void recordStop(View v) {
         if (amplitudeReader != null)
         {
             amplitudeReader.stopRecording();
+            amplitudeReader = null;
         }
     }
 

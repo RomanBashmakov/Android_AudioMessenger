@@ -4,4 +4,7 @@ package com.example.audiorecorder.application;
 
 
 public class Protocol {
+    //конструктор, Преамбулу даем в виде отдельной переменной
+    //метод получения набора бит из текста
+    //добавление преамбулы
 }
