@@ -19,6 +19,9 @@ public class receiverSettingsAdapter extends BaseAdapter {
     ArrayList<ReceiverSetting> objects;
     SetReceiverSettingCallback callback;
 
+    int defaultFrequency = 500;
+    final float defaultBD = (float) 0.3;
+
     receiverSettingsAdapter(Context context,
                             ArrayList<ReceiverSetting> receiverSettingsList,
                             SetReceiverSettingCallback setReceiverSettingCallback) {
@@ -73,8 +76,19 @@ public class receiverSettingsAdapter extends BaseAdapter {
 
             @Override
             public void afterTextChanged(Editable s) {
-                callback.newBDSetting(Float.parseFloat(viewHolderReceiver.textBD.getText().toString()), position);
-                callback.setBitDuration(RS.duration);
+                try
+                {
+                    callback.newBDSetting(Float.parseFloat(viewHolderReceiver.textBD.getText().toString()), position);
+                    callback.setBitDuration(RS.duration);
+                    if (RS.checkedF)
+                    {
+                        callback.saveSetting(position);
+                    }
+                }
+                catch (NumberFormatException e)
+                {
+                    callback.setBitDuration(defaultBD);
+                }
             }
         });
 
@@ -90,32 +104,43 @@ public class receiverSettingsAdapter extends BaseAdapter {
             @Override
             public void afterTextChanged(Editable s)
             {
-                callback.newFrequencySetting(Integer.parseInt(viewHolderReceiver.textFrequency.getText().toString()), position);
-                callback.setFrequency(RS.frequency);
+                try
+                {
+                    callback.newFrequencySetting(Integer.parseInt(viewHolderReceiver.textFrequency.getText().toString()), position);
+                    callback.setFrequency(RS.frequency);
+                    if (RS.checkedF)
+                    {
+                        callback.saveSetting(position);
+                    }
+                }
+                catch (NumberFormatException e)
+                {
+                    callback.setFrequency(defaultFrequency);
+                }
             }
         });
 
         viewHolderReceiver.buttonDelete.setOnClickListener (new View.OnClickListener()
-                                                            {
-                                                                @Override
-                                                                public void onClick(View v)
-                                                                {
-                                                                    callback.deleteSetting(position);
-                                                                }
-                                                            }
+        {
+            @Override
+            public void onClick(View v)
+            {
+                callback.deleteSetting(position);
+            }
+        }
         );
 
         viewHolderReceiver.rb.setOnClickListener(new View.OnClickListener()
-                                                 {
-                                                     @Override
-                                                     public void onClick(View v)
-                                                     {
-                                                         callback.checkSetting(position);
-                                                         callback.setFrequency(RS.frequency);
-                                                         callback.setBitDuration(RS.duration);
-                                                         callback.saveSetting(position);
-                                                     }
-                                                 }
+        {
+            @Override
+            public void onClick(View v)
+            {
+                callback.checkSetting(position);
+                callback.setFrequency(RS.frequency);
+                callback.setBitDuration(RS.duration);
+                callback.saveSetting(position);
+            }
+        }
         );
 
         return view;

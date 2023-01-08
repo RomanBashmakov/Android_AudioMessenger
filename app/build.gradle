@@ -39,6 +39,8 @@ dependencies {
     implementation 'android.arch.navigation:navigation-fragment:1.0.0'
     implementation 'android.arch.navigation:navigation-ui:1.0.0'
     implementation 'com.google.code.gson:gson:2.8.2'
+    implementation fileTree(dir: '/Users/mac/Documents/Android/Audio/Android_AudioMessenger/app/libs', include: ['*.aar', '*.jar'], exclude: [])
+    implementation files('libs/reedsolomon.jar')
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

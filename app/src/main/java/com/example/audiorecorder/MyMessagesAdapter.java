@@ -59,13 +59,15 @@ public class MyMessagesAdapter extends BaseAdapter {
         if (oneMessage.input0output1)
         {
             viewHolder.textMessage.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+            viewHolder.textData.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
         }
         else
         {
             viewHolder.textMessage.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
+            viewHolder.textData.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
         }
         viewHolder.textMessage.setText(oneMessage.messageData);
-        //viewHolder.textData.setText(oneMessage);
+        viewHolder.textData.setText(oneMessage.deliveredTime);
 
         viewHolder.buttonDelete.setOnClickListener (new View.OnClickListener()
                                                     {

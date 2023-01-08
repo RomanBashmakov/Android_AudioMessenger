@@ -2,6 +2,8 @@ package com.example.audiorecorder;
 
 import android.os.Handler;
 
+import com.casualcoding.reedsolomon.EncoderDecoder;
+
 import java.util.ArrayList;
 import java.util.List;
 

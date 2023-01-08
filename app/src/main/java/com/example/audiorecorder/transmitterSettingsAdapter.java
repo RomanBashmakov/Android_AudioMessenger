@@ -81,6 +81,10 @@ public class transmitterSettingsAdapter extends BaseAdapter {
                 {
                     callback.newBDSetting(Float.parseFloat(viewHolder.textBD.getText().toString()), position);
                     callback.setBitDuration(TS.duration);
+                    if (TS.checkedF)
+                    {
+                        callback.saveSetting(position);
+                    }
                 }
                 catch (NumberFormatException e)
                 {
@@ -105,6 +109,10 @@ public class transmitterSettingsAdapter extends BaseAdapter {
                 {
                     callback.newFrequencySetting(Integer.parseInt(viewHolder.textFrequency.getText().toString()), position);
                     callback.setFrequency(TS.frequency);
+                    if (TS.checkedF)
+                    {
+                        callback.saveSetting(position);
+                    }
                 }
                 catch (NumberFormatException e)
                 {

@@ -8,5 +8,4 @@ public interface SetTransmitterSettingCallback {
     void setFrequency(int frequency);
     void newBDSetting(float typedBD, int Position);
     void newFrequencySetting(int typedFrequency, int Position);
-
 }

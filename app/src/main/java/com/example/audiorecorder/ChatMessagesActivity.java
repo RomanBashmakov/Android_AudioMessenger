@@ -18,7 +18,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class ChatMessagesActivity extends AppCompatActivity {
 
@@ -52,7 +55,7 @@ public class ChatMessagesActivity extends AppCompatActivity {
         btnTransmit = findViewById(R.id.Transmit);
         lvMessages = findViewById(R.id.lvMessages);
 
-        messagesList = new ArrayList<>();
+        loadChat();
 
         myMessagesAdapter = new MyMessagesAdapter(this, messagesList, new MyMessagesAdapterCallbackHere());
         lvMessages.setAdapter(myMessagesAdapter);
@@ -106,12 +109,35 @@ public class ChatMessagesActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause() {
+    public void onPause()
+    {
         super.onPause();
-
-
+        recordStop();
+        saveChat();
     }
 
+    public void saveChat()
+    {
+        SharedPreferences sharedPreferences = getSharedPreferences("saved chat messages", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(messagesList);
+        editor.putString("saved messages", json);
+        editor.apply();
+    }
+
+    public void loadChat()
+    {
+        SharedPreferences sharedPreferences = getSharedPreferences("saved chat messages", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("saved messages", null);
+        Type type = new TypeToken<ArrayList<MyMessage>>() {}.getType();
+        messagesList = gson.fromJson(json, type);
+
+        if (messagesList == null) {
+            messagesList = new ArrayList<>();
+        }
+    }
 
     public ReceiverSetting loadReceiverSetting() {
         SharedPreferences sharedPreferences = getSharedPreferences("saved receiver setting", MODE_PRIVATE);
@@ -141,13 +167,15 @@ public class ChatMessagesActivity extends AppCompatActivity {
     {
         Log.d("msg", "msg 3" + newMessage);
 
-        messagesList.add(new MyMessage(newMessage, false));
+        String currentTime = new SimpleDateFormat("HH:mm' 'dd.MM.yyyy", Locale.getDefault()).format(new Date());
+        messagesList.add(new MyMessage(newMessage, false, currentTime));
         myMessagesAdapter.notifyDataSetChanged();
     }
 
     public void addTransmittedMessage(String newMessage)
     {
-        messagesList.add(new MyMessage(newMessage, true));
+        String currentTime = new SimpleDateFormat("HH:mm' 'dd.MM.yyyy", Locale.getDefault()).format(new Date());
+        messagesList.add(new MyMessage(newMessage, true, currentTime));
         myMessagesAdapter.notifyDataSetChanged();
     }
 
@@ -161,11 +189,10 @@ public class ChatMessagesActivity extends AppCompatActivity {
         }
     }
 
-    public void recordStop(View v) {
+    public void recordStop() {
         if (amplitudeReader != null)
         {
             amplitudeReader.stopRecording();
-            amplitudeReader = null;
         }
     }
 
